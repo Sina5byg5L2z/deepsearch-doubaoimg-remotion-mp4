@@ -52,6 +52,8 @@ node node_modules/@remotion/cli/remotion-cli.js render src/index.js Film out/ful
 
 ## 风格选择
 
+**用户已在 Step 0 用样板页选定风格**（`assets/style-samples.html`，含 7 风格可视样张，
+工程约定里有「风格编号 + 主题适配说明」，照此执行，不要再让用户重选）。
 7 种代码画风的完整方法论见 [`references/style-7-methods.md`](references/style-7-methods.md)
 （像素风 / 老电视 / 手绘绘本 / 3D / 产品宣传片 / 知识科普 / 自由发挥）。
 风格要点：
