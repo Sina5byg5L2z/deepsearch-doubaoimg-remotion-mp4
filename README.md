@@ -41,7 +41,7 @@ git clone https://github.com/Sina5byg5L2z/deepsearch-doubaoimg-remotion-mp4.git
 ```
 
 1. 把 `skills/` 下的各目录复制到你的 Agent 的 skills 目录（如 Claude Code 的 `~/.claude/skills/`）
-2. 按 [`SKILL.md`](SKILL.md)（总入口）的流程编排：给出一个选题 → **Agent 先展示 7 风格样板页让用户选风格（Step 0，BLOCKING）** → 再自动走完 5 个阶段 → 产出成片 + 发布包
+2. 按 [`SKILL.md`](SKILL.md)（总入口）的流程编排：给出一个选题 → **Agent 先展示 7 风格样板页，用户手动选风格或让 AI 按调研内容自动匹配（Step 0，BLOCKING）** → 再自动走完 5 个阶段 → 产出成片 + 发布包
 3. 豆包插画需要一次性准备：本机 Chrome + playwright-core，首次扫码登录豆包后登录态存在持久 profile 里，之后全自动
 
 ## 环境依赖

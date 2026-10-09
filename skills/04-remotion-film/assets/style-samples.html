@@ -19,6 +19,14 @@
   .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(370px, 1fr)); gap: 26px; }
   .card { background: var(--card); border: 1px solid var(--line); border-radius: 14px; overflow: hidden; box-shadow: 0 1px 3px rgba(30,25,15,.06); }
   .card.picked { outline: 3px solid var(--accent); }
+  .auto { grid-column: 1 / -1; background: linear-gradient(135deg, #1c1a17 0%, #2b2620 100%); border: 1px solid #3a352d; color: #f4efe6; }
+  .auto .meta h2 { color: #f4efe6; }
+  .auto .meta p { color: #b5ad9e; }
+  .auto .pick { background: #ff5a1f; }
+  .auto table { width: 100%; border-collapse: collapse; font-size: 12px; margin-top: 10px; }
+  .auto td { padding: 4px 8px; border-bottom: 1px solid #35302a; line-height: 1.5; }
+  .auto td:first-child { color: #d8d2c6; width: 46%; }
+  .auto td:last-child { color: #ff9a66; font-weight: 700; }
   .preview { aspect-ratio: 16/9; position: relative; overflow: hidden; }
   .meta { padding: 14px 18px 18px; }
   .meta h2 { font-size: 17px; display: flex; align-items: baseline; gap: 10px; }
@@ -72,11 +80,34 @@
   <h1>代码画视频 · 7 种风格样板</h1>
   <p class="lead">Agent 做视频前，把本页展示给用户选风格。所有画面由代码绘制（Remotion 落地），零图片素材、零模型文件，渲染成 MP4。点击卡片右上角「选这个」高亮你的选择。</p>
   <div class="howto">
-    <b>Agent 使用说明（BLOCKING）</b>：项目一开始就 present 本页并让用户选定风格，确认后把「风格编号 + 主题适配说明」写进工程约定再动工。
-    <b>禁止先开工中途再问</b>——风格返工 = 全片重渲。用户也可以指定多个候选，让 Agent 先出 3 张主题适配样张后再拍板。
+    <b>Agent 使用说明（BLOCKING）</b>：项目一开始就 present 本页让用户做两选一——
+    <b>① 手动指定</b>：用户点某张卡片选风格；<b>② AI 自动匹配</b>：用户点首屏深色卡（或说「自动」），
+    Agent 在调研结束时按匹配矩阵选定风格并给出理由，用户可否决一次。
+    确认后把「风格编号 + 主题适配说明」写进工程约定再动工。
+    <b>禁止先开工中途再问</b>——风格返工 = 全片重渲。
   </div>
 
   <div class="grid" id="grid">
+    <!-- ⓪ AI 自动匹配 -->
+    <div class="card auto">
+      <div class="preview" style="aspect-ratio: auto; padding: 18px 22px 6px;">
+        <div style="font-size: 15px; font-weight: 800; letter-spacing: 1px;">让 AI 根据调研内容自动匹配最合适的风格</div>
+        <div style="font-size: 12px; color: #b5ad9e; margin-top: 6px; line-height: 1.7;">
+          选这项就不用拍板。AI 在调研结束时按下面的匹配矩阵选定风格 + 给出理由（你可以说「换一个」否决一次），随后全片照此执行。混合题材允许主风格 + 副风格点缀（如主叙事用复古电视、数据幕用印刷排版）。</div>
+        <button class="pick">选自动匹配</button>
+      </div>
+      <div class="meta">
+        <table>
+          <tr><td>历史回顾 / 年代叙事 / 怀旧题材</td><td>② 复古电视风</td></tr>
+          <tr><td>游戏机制 / 复古科技 / 电子乐文化</td><td>① 像素风</td></tr>
+          <tr><td>人物故事 / 温暖叙事 / 大众科普</td><td>③ 手绘绘本风</td></tr>
+          <tr><td>空间结构 / 机械原理 / 产品拆解</td><td>④ 3D 风</td></tr>
+          <tr><td>工具教程 / 效率演示 / 软件评测</td><td>⑤ 产品宣传片风</td></tr>
+          <tr><td>年鉴式数据梳理 / 调研报告可视化</td><td>⑥ 知识科普（印刷排版）风</td></tr>
+          <tr><td>强观点输出 / 快节奏混剪 / 开场炸场</td><td>⑦ 自由发挥风</td></tr>
+        </table>
+      </div>
+    </div>
     <!-- ① -->
     <div class="card">
       <div class="preview px">
