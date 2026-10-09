@@ -1,0 +1,6 @@
+node_modules/
+.chrome-doubao/
+*.log
+out/
+qa/
+.DS_Store

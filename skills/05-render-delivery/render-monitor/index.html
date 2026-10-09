@@ -1,0 +1,275 @@
+<!DOCTYPE html>
+<html lang="zh-CN" data-theme="dark">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>渲染监控 · RENDER MONITOR</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700;800&family=Noto+Sans+SC:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+/* ---------- 令牌层：工业仪表 · 暖黑底 · 单一琥珀强调 ---------- */
+:root {
+  --color-bg: #12110f;
+  --color-surface: #1a1916;
+  --color-surface-2: #22201c;
+  --color-text: #f5f1ea;
+  --color-muted: #a09a90;
+  --color-border: rgba(245,241,234,.14);
+  --color-accent: #ffb020;          /* 琥珀：进行中 */
+  --color-ok: #3ddc84;              /* 绿：完成 */
+  --color-bad: #ff5252;             /* 红：失败 */
+  --font-mono: 'JetBrains Mono', 'Noto Sans SC', monospace;
+  --font-sans: 'Noto Sans SC', sans-serif;
+  --radius: 6px;
+  --space-2: 8px; --space-3: 16px; --space-4: 24px; --space-5: 40px;
+  --ease-out: cubic-bezier(.16,1,.3,1);
+  --dur-fast: 160ms; --dur-base: 320ms;
+}
+* { margin: 0; padding: 0; box-sizing: border-box; }
+html { background: var(--color-bg); }
+body {
+  font-family: var(--font-mono); color: var(--color-text);
+  min-height: 100vh; padding: var(--space-4);
+  background-image:
+    radial-gradient(50rem 32rem at 85% -10%, rgba(255,176,32,.07), transparent 60%),
+    radial-gradient(40rem 30rem at -10% 110%, rgba(61,220,132,.05), transparent 55%);
+}
+/* 颗粒纹理层 */
+body::after {
+  content: ""; position: fixed; inset: 0; pointer-events: none; opacity: .04;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.8'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+}
+.wrap { max-width: 1080px; margin: 0 auto; display: grid; gap: var(--space-3); }
+header { display: flex; align-items: baseline; gap: var(--space-3); flex-wrap: wrap; border-bottom: 1px solid var(--color-border); padding-bottom: var(--space-3); }
+h1 { font-size: 20px; font-weight: 800; letter-spacing: .08em; }
+h1 .dot { color: var(--color-accent); }
+.logname { color: var(--color-muted); font-size: 13px; word-break: break-all; }
+.select { margin-left: auto; }
+select {
+  background: var(--color-surface); color: var(--color-text); border: 1px solid var(--color-border);
+  border-radius: var(--radius); padding: 6px 10px; font-family: var(--font-mono); font-size: 13px;
+}
+
+/* ---------- 状态灯 ---------- */
+.beacon { display: inline-flex; align-items: center; gap: 10px; font-size: 14px; letter-spacing: .12em; }
+.beacon .led { width: 12px; height: 12px; border-radius: 50%; background: var(--color-accent); }
+.beacon.rendering .led { animation: pulse 1.2s ease-in-out infinite; }
+.beacon.done .led { background: var(--color-ok); }
+.beacon.failed .led { background: var(--color-bad); }
+.beacon.idle .led { background: var(--color-muted); }
+@keyframes pulse { 50% { opacity: .25; transform: scale(.8); } }
+
+/* ---------- 主读数 ---------- */
+.hero { display: grid; grid-template-columns: minmax(0,1fr) 260px; gap: var(--space-3); align-items: stretch; }
+.panel {
+  background: var(--color-surface); border: 1px solid var(--color-border);
+  border-radius: var(--radius); padding: var(--space-4);
+}
+.bigpct { font-size: clamp(72px, 14vw, 150px); font-weight: 800; line-height: .95; letter-spacing: -0.03em; font-variant-numeric: tabular-nums; }
+.bigpct small { font-size: .35em; color: var(--color-accent); }
+.biglabel { color: var(--color-muted); font-size: 13px; margin-top: 6px; letter-spacing: .1em; }
+
+/* 进度条：条纹流动 */
+.bar { margin-top: var(--space-4); height: 18px; border: 1px solid var(--color-border); border-radius: var(--radius); overflow: hidden; background: var(--color-surface-2); }
+.bar > i {
+  display: block; height: 100%; width: 0%;
+  background: repeating-linear-gradient(-55deg, var(--color-accent) 0 10px, #d9960f 10px 20px);
+  transition: width .6s var(--ease-out);
+}
+.bar.done > i { background: var(--color-ok); }
+.bar.failed > i { background: var(--color-bad); }
+
+/* 指标网格 */
+.metrics { display: grid; grid-template-columns: 1fr 1fr; gap: 1px; background: var(--color-border); border: 1px solid var(--color-border); border-radius: var(--radius); overflow: hidden; }
+.metric { background: var(--color-surface); padding: var(--space-3); }
+.metric .k { color: var(--color-muted); font-size: 11px; letter-spacing: .14em; }
+.metric .v { font-size: 26px; font-weight: 700; font-variant-numeric: tabular-nums; margin-top: 4px; }
+.metric .v small { font-size: 13px; color: var(--color-muted); }
+
+/* 阶段流水 */
+.stages { display: flex; gap: 0; align-items: center; flex-wrap: wrap; }
+.stage { display: flex; align-items: center; gap: 8px; padding: 8px 14px; border: 1px solid var(--color-border); background: var(--color-surface); font-size: 13px; }
+.stage + .stage { border-left: none; }
+.stage i { width: 8px; height: 8px; border-radius: 50%; background: var(--color-muted); flex-shrink: 0; }
+.stage.on { color: var(--color-accent); border-color: rgba(255,176,32,.5); }
+.stage.on i { background: var(--color-accent); animation: pulse 1.2s infinite; }
+.stage.past { color: var(--color-ok); }
+.stage.past i { background: var(--color-ok); }
+.stage.bad { color: var(--color-bad); }
+.stage.bad i { background: var(--color-bad); }
+
+/* 日志尾 */
+.logtail { font-size: 12px; line-height: 1.7; color: var(--color-muted); white-space: pre-wrap; word-break: break-all; max-height: 150px; overflow: hidden; }
+.logtail .err { color: var(--color-bad); font-weight: 700; }
+
+/* 错误横幅 */
+.error-banner {
+  border: 1px solid var(--color-bad); background: rgba(255,82,82,.08); color: var(--color-bad);
+  padding: var(--space-3); border-radius: var(--radius); font-size: 13px; word-break: break-all;
+}
+/* 完成横幅 */
+.done-banner {
+  border: 1px solid var(--color-ok); background: rgba(61,220,132,.07); color: var(--color-ok);
+  padding: var(--space-3); border-radius: var(--radius); font-size: 13px;
+}
+.reveal { opacity: 0; transform: translateY(16px); }
+.reveal.in { opacity: 1; transform: none; transition: opacity var(--dur-base) var(--ease-out), transform var(--dur-base) var(--ease-out); }
+.reveal:nth-child(2) { transition-delay: 70ms; } .reveal:nth-child(3) { transition-delay: 140ms; }
+.reveal:nth-child(4) { transition-delay: 210ms; } .reveal:nth-child(5) { transition-delay: 280ms; }
+@media (prefers-reduced-motion: reduce) {
+  .reveal { opacity: 1; transform: none; transition: none; }
+  .beacon.rendering .led, .stage.on i { animation: none; }
+  .bar > i { transition: none; }
+}
+@media (max-width: 760px) {
+  .hero { grid-template-columns: 1fr; }
+  .metrics { grid-template-columns: repeat(2, 1fr); }
+  .select { margin-left: 0; width: 100%; }
+}
+a:focus-visible, select:focus-visible, button:focus-visible { outline: 2px solid var(--color-accent); outline-offset: 2px; }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header class="reveal in">
+    <h1>RENDER<span class="dot">·</span>MONITOR</h1>
+    <span class="beacon idle" id="beacon"><span class="led"></span><span id="stateText">连接中</span></span>
+    <span class="logname" id="logname"></span>
+    <span class="select"><select id="logsel" aria-label="选择日志"></select></span>
+  </header>
+
+  <section class="hero">
+    <div class="panel reveal in">
+      <div class="bigpct"><span id="pct">--</span><small>%</small></div>
+      <div class="biglabel" id="pctLabel">等待数据</div>
+      <div class="bar" id="bar"><i></i></div>
+    </div>
+    <div class="panel reveal in" style="display:grid; gap:var(--space-3); align-content:start;">
+      <canvas id="spark" width="220" height="64" aria-label="帧速率曲线"></canvas>
+      <div style="color:var(--color-muted); font-size:11px; letter-spacing:.14em;">帧速率 · 最近 3 分钟</div>
+    </div>
+  </section>
+
+  <section class="metrics reveal in">
+    <div class="metric"><div class="k">帧 FRAME</div><div class="v" id="frames">--</div></div>
+    <div class="metric"><div class="k">速度 FPS</div><div class="v" id="fps">--</div></div>
+    <div class="metric"><div class="k">剩余 REMAINING</div><div class="v" id="remain">--</div></div>
+    <div class="metric"><div class="k">已运行 ELAPSED</div><div class="v" id="elapsed">--</div></div>
+    <div class="metric"><div class="k">预计完成 ETA</div><div class="v" id="eta" style="font-size:20px;">--</div></div>
+  </section>
+
+  <section class="stages reveal in" id="stages" aria-label="渲染链阶段">
+    <div class="stage" data-s="render"><i></i>渲染</div>
+    <div class="stage" data-s="encoding"><i></i>编码</div>
+    <div class="stage" data-s="mux"><i></i>混音封装</div>
+    <div class="stage" data-s="cover"><i></i>封面</div>
+    <div class="stage" data-s="all"><i></i>交付</div>
+  </section>
+
+  <div id="banner"></div>
+
+  <section class="panel reveal in">
+    <div class="logtail" id="logtail">--</div>
+  </section>
+</div>
+
+<script>
+// ---------- 仪表盘逻辑：1s 轮询 /api/progress ----------
+const $ = id => document.getElementById(id);
+const pad2 = n => String(n).padStart(2, '0');
+const fmtHMS = s => { if (s == null) return '--'; const h=Math.floor(s/3600), m=Math.floor(s%3600/60), x=Math.floor(s%60); return h?`${h}:${pad2(m)}:${pad2(x)}`:`${m}:${pad2(x)}`; };
+const STAGE_ORDER = ['render','encoding','mux','cover','all'];
+const STATE_STAGE = { rendering:'render', encoding:'encoding', muxing:'mux', covering:'cover', all_done:'all' };
+let currentLog = null;
+
+async function fetchJSON(u) { const r = await fetch(u); return r.json(); }
+
+function render(d) {
+  // 状态灯
+  const beacon = $('beacon'), st = { rendering:'渲染中', encoding:'编码中', muxing:'混音封装中', covering:'生成封面中', all_done:'全部完成', done:'完成', failed:'失败', idle:'空闲', error:'错误', running:'进行中', missing:'日志缺失' };
+  beacon.className = 'beacon ' + (d.state === 'all_done' || d.state === 'done' ? 'done' : d.state === 'failed' ? 'failed' : d.state === 'idle' ? 'idle' : d.state === 'rendering' || d.state === 'encoding' || d.state === 'muxing' || d.state === 'covering' ? 'rendering' : 'idle');
+  $('stateText').textContent = st[d.state] || d.state;
+  $('logname').textContent = d.dir || '';
+
+  // 日志选择器
+  if (d.files) {
+    const sel = $('logsel');
+    if (sel.options.length !== d.files.length || sel.dataset.cur !== d.files.join()) {
+      sel.innerHTML = d.files.map(f => `<option value="${f}">${f}</option>`).join('');
+      sel.dataset.cur = d.files.join();
+    }
+    if (d.active && sel.value !== d.active) sel.value = d.active;
+  }
+
+  // 进度
+  const hasFrame = d.frame != null && d.total;
+  const pct = hasFrame ? d.frame / d.total * 100 : (d.state === 'all_done' ? 100 : null);
+  $('pct').textContent = pct == null ? '--' : pct.toFixed(1);
+  $('pctLabel').textContent = hasFrame ? `${d.state === 'encoding' ? '正在编码' : '正在渲染'} ${d.active}` : (d.state === 'all_done' ? '渲染链全部完成' : st[d.state] || '');
+  const bar = $('bar');
+  bar.className = 'bar' + (d.state === 'all_done' || d.state === 'done' ? ' done' : d.state === 'failed' ? ' failed' : '');
+  bar.firstElementChild.style.width = (pct ?? 0) + '%';
+
+  $('frames').innerHTML = hasFrame ? `${d.frame.toLocaleString()}<small> / ${d.total.toLocaleString()}</small>` : '--';
+  $('fps').textContent = d.fps ? d.fps.toFixed(1) : '--';
+  $('remain').textContent = fmtHMS(d.remainingSec);
+  $('elapsed').textContent = fmtHMS(d.elapsedSec);
+  $('eta').textContent = d.remainingSec ? new Date(Date.now() + d.remainingSec * 1000).toLocaleTimeString('zh-CN', { hour12: false }) : '--';
+
+  // 阶段流水
+  const cur = STATE_STAGE[d.state];
+  document.querySelectorAll('.stage').forEach(el => {
+    const s = el.dataset.s;
+    el.className = 'stage';
+    if (d.state === 'failed' && s === cur) { el.classList.add('bad'); return; }
+    if (cur == null) return;
+    const idx = STAGE_ORDER.indexOf(s), curIdx = STAGE_ORDER.indexOf(cur);
+    if (idx < curIdx) el.classList.add('past');
+    else if (idx === curIdx) el.classList.add('on');
+    if (d.state === 'all_done') el.classList.add('past');
+  });
+
+  // 横幅
+  const bn = $('banner');
+  if (d.state === 'failed') {
+    bn.innerHTML = `<div class="error-banner">✕ 渲染失败：${d.error || '未知错误'}</div>`;
+  } else if (d.state === 'all_done' && d.output) {
+    bn.innerHTML = `<div class="done-banner">✓ 完成 · ${d.output.f}（${d.output.mb} MB）</div>`;
+  } else bn.innerHTML = '';
+
+  // 日志尾
+  $('logtail').innerHTML = (d.tail || []).map(l => /Error/i.test(l) ? `<span class="err">${l.replace(/</g,'&lt;')}</span>` : l.replace(/</g,'&lt;')).join('\n') || '--';
+
+  drawSpark(d.spark);
+}
+
+// ---------- sparkline ----------
+function drawSpark(pts) {
+  const cv = $('spark'), ctx = cv.getContext('2d');
+  ctx.clearRect(0, 0, cv.width, cv.height);
+  if (!pts || pts.length < 2) return;
+  const xs = pts.map(p => p.t), ys = pts.map(p => p.n);
+  const t0 = Math.min(...xs), t1 = Math.max(...xs), n0 = Math.min(...ys), n1 = Math.max(...ys);
+  const X = t => 4 + (t - t0) / Math.max(1, t1 - t0) * (cv.width - 8);
+  const Y = n => cv.height - 6 - (n - n0) / Math.max(1, n1 - n0) * (cv.height - 12);
+  ctx.strokeStyle = '#ffb020'; ctx.lineWidth = 2; ctx.beginPath();
+  pts.forEach((p, i) => i ? ctx.lineTo(X(p.t), Y(p.n)) : ctx.moveTo(X(p.t), Y(p.n)));
+  ctx.stroke();
+  const last = pts[pts.length - 1];
+  ctx.fillStyle = '#ffb020'; ctx.beginPath(); ctx.arc(X(last.t), Y(last.n), 3, 0, 7); ctx.fill();
+}
+
+// ---------- 轮询 ----------
+async function tick() {
+  try {
+    const d = await fetchJSON('/api/progress' + (currentLog ? `?log=${encodeURIComponent(currentLog)}` : ''));
+    currentLog = d.active || currentLog;
+    render(d);
+  } catch { /* 网络抖动忽略 */ }
+}
+$('logsel').addEventListener('change', e => { currentLog = e.target.value; tick(); });
+tick(); setInterval(tick, 1000);
+</script>
+</body>
+</html>
