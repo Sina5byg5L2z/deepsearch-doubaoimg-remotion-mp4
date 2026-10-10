@@ -26,9 +26,13 @@ chrome.exe --remote-debugging-port=9222 --user-data-dir=./.chrome-doubao \
 1. **launch-doubao.mjs**：拉起/连接 Chrome（detached 拉起保证父进程退出后 Chrome 存活），
    等 CDP 就绪，输出 `CDP_READY`。
 2. **run-illus.sh**：逐行读 `prompts.txt`（格式 `场景ID|提示词`），
-   已生成的跳过（断点续跑），失败自动重试一次。
+   已生成的跳过（断点续跑），失败自动重试一次；**结尾按硬规则输出独特标记**：
+   全部成功 `BG_SUCCESS doubao-illus`，有失败 `BG_FAIL doubao-illus failed=<场景ID列表>`。
 3. **doubao-one.mjs**：单条全流程——发送提示词 → 每 5s 轮询「停止生成」字样消失
    → 确认有新图出现 → 用 playwright 的 `ctx.request.get()`（共享 cookie）下载原图 → 退出。
+4. **看护（用户硬规则 2026-10-10）**：整批任务日志必须以 BG_SUCCESS/BG_FAIL 收尾，
+   用 `../05-render-delivery/scripts/watch-bg.mjs` 做前台/后台看护（标记定论 + 卡死检测），
+   禁止向对话输出过程信息、禁止 sleep 或手动轮询。
 
 ```bash
 # 整批无人值守（后台跑）

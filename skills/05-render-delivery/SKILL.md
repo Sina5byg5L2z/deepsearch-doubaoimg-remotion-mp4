@@ -57,6 +57,29 @@ node render-monitor/server.mjs --dir <渲染日志目录> --port 8788
 ```
 自动发现目录里最新 render*.log，解析 "Rendered N/M, time remaining" 与 *_EXIT 标记。
 
+## 后台任务标记与前台看护（用户硬规则 2026-10-10，取代"等通知/sleep/聊天轮询"）
+
+- **所有后台任务（渲染/生图/TTS/批处理）禁止向对话输出过程信息**——进度只存在于日志与监控网页。
+- **后台任务必须在日志里以独特标记收尾**（定论唯一、可 grep）：
+  - 成功：`BG_SUCCESS <任务名> output=<产物路径>`
+  - 失败：`BG_FAIL <任务名> reason=<一句话>`
+  - bash 包装模板：`cmd > task.log 2>&1; rc=$?; [ $rc -eq 0 ] && echo "BG_SUCCESS task output=..." || echo "BG_FAIL task rc=$rc"`
+  - 任务启动时把自身 PID 写 `<日志路径>.pid`（node: `fs.writeFileSync(p, String(process.pid))`；bash: `echo $$ > p`）
+- **前台看护器 `scripts/watch-bg.mjs`**（零依赖）：不是 sleep 空等，而是每 2s 检查
+  「日志新增行 + 进程存活」两个事实——命中成功/失败标记即定论退出；进程退出无成功标记 = 失败；
+  日志 `--hang-seconds` 无增长且进程存活 = 卡死；全局超时 = 卡死。退出码 0/1/2/3。
+
+  ```bash
+  # 短任务（<10 分钟）：前台阻塞到定论，一条命令拿结果
+  node watch-bg.mjs --log out/task.log --pid-file out/task.log.pid \
+    --success "BG_SUCCESS" --fail "BG_FAIL" --hang-seconds 120 --timeout 3600
+  # 长任务：watcher 本身后台运行，它的退出通知即最终裁决（裁决行带 BG_SUCCESS/BG_FAIL/BG_HANG），
+  # Agent 只读一次日志尾部，不轮询、不转述过程。
+  ```
+
+- 上一节的 `rend()` 看门狗保留用于 Remotion 渲染链（它本身就是前台检测日志标记的阻塞函数）；
+  其余一切新写的后台任务一律用 watch-bg.mjs。
+
 ## 失败恢复（禁止直接重渲）
 
 - 报 `remotion-stitch-temp-dir ... No such file or directory`：帧/编码其实已完成。
