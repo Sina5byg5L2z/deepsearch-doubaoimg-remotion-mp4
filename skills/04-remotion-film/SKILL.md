@@ -52,10 +52,14 @@ node node_modules/@remotion/cli/remotion-cli.js render src/index.js Film out/ful
 
 ## 风格选择
 
-**用户已在 Step 0 用样板页选定风格**（`assets/style-samples.html`，含 7 风格可视样张，
-工程约定里有「风格编号 + 主题适配说明」，照此执行，不要再让用户重选）。
-7 种代码画风的完整方法论见 [`references/style-7-methods.md`](references/style-7-methods.md)
-（像素风 / 老电视 / 手绘绘本 / 3D / 产品宣传片 / 知识科普 / 自由发挥）。
+**用户已在 Step 0 用样板页选定风格**（`assets/style-samples.html`，12 种风格可视样张：
+①–⑦ 基础风格 + ⑧–⑫ 开源项目衍生风格，工程约定里有「风格编号 + 主题适配说明」，照此执行，不要再让用户重选）。
+基础 7 风格的方法论见 [`references/style-7-methods.md`](references/style-7-methods.md)
+（像素风 / 老电视 / 手绘绘本 / 3D / 产品宣传片 / 知识科普 / 自由发挥）；
+开源衍生 5 风格的落地手册见 [`references/style-open-source.md`](references/style-open-source.md)
+（⑧ Neo-Brutalism ← neobrutalism.dev / ⑨ Geist 暗色极简 ← vercel/geist /
+⑩ Aceternity 发光渐变 ← Aceternity UI / ⑪ Rough.js 草图黑板 ← roughjs /
+⑫ 数据大屏 ← ECharts 生态，含 Remotion 动效落地要点与混搭规则）。
 风格要点：
 
 - **一种风格贯彻全片**，配色 ≤ 4 主色 + 1 强调色，字体 1 标题 + 1 正文

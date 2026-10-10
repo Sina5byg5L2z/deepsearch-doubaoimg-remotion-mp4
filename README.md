@@ -21,7 +21,7 @@
 | [`skills/01-research`](skills/01-research/SKILL.md) | 深度调研 | 8 步法、事实卡片、独立 Agent 校验、专名零容忍、三层确定性标注 |
 | [`skills/02-script`](skills/02-script/SKILL.md) | 文案与分镜 | 视频文案结构、分镜表、字幕稿、TTS 时长表、场景提示词规划 |
 | [`skills/03-doubao-images`](skills/03-doubao-images/SKILL.md) | 插画生成 | 豆包 CDP 自动化脚本、批量重试、插画提示词模板、水印裁剪 |
-| [`skills/04-remotion-film`](skills/04-remotion-film/SKILL.md) | 视频合成 | 工程结构、timeline 构建器、7 种代码画风方法论、剪辑手法强化指南 |
+| [`skills/04-remotion-film`](skills/04-remotion-film/SKILL.md) | 视频合成 | 工程结构、timeline 构建器、12 种风格样板（7 基础 + 5 个开源项目衍生：Geist/Neo-Brutalism/Aceternity/roughjs/ECharts）、剪辑手法强化指南 |
 | [`skills/05-render-delivery`](skills/05-render-delivery/SKILL.md) | 渲染交付 | 渲染前检查清单、日志看门狗、监控网页、ffmpeg 混音封装坑、抽帧 QA、发布包 |
 
 每个 skill 目录里的 `SKILL.md` 都是独立可用的 Agent skill（含 frontmatter），既可以在一个 Agent 会话里按 01→05 串成完整流水线，也可以单独取用某一环。

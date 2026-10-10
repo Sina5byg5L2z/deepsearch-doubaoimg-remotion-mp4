@@ -73,12 +73,46 @@
   .free .frag { position: absolute; border: 2px solid #ff5a1f; width: 34px; height: 34px; }
   .free .f1 { left: 16%; top: 22%; transform: rotate(14deg); }
   .free .f2 { right: 18%; bottom: 24%; transform: rotate(-9deg); border-radius: 50%; }
+  /* ---- ⑧ Neo-Brutalism（neobrutalism.dev, MIT）---- */
+  .nb { background: #fefdf8; padding: 6%; }
+  .nb .blk { position: absolute; border: 4px solid #000; box-shadow: 8px 8px 0 #000; background: #ffd02f; padding: 8px 14px; font-weight: 900; font-size: 20px; letter-spacing: 1px; }
+  .nb .b1 { left: 7%; top: 20%; transform: rotate(-2deg); }
+  .nb .b2 { left: 24%; top: 46%; background: #ff90e8; transform: rotate(1.5deg); font-size: 15px; }
+  .nb .star { position: absolute; right: 12%; top: 14%; width: 52px; height: 52px; background: #23a094; border: 4px solid #000; box-shadow: 6px 6px 0 #000; transform: rotate(12deg); }
+  .nb .tape { position: absolute; right: 8%; bottom: 16%; background: #fff; border: 4px solid #000; box-shadow: 6px 6px 0 #000; font-size: 11px; font-weight: 800; padding: 6px 12px; transform: rotate(-3deg); }
+  /* ---- ⑨ Geist / Vercel 暗色极简 ---- */
+  .gz { background: #050505; display: flex; align-items: center; justify-content: center; position: relative; }
+  .gz .grid { position: absolute; inset: 0; background-image: linear-gradient(rgba(255,255,255,.045) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,.045) 1px, transparent 1px); background-size: 28px 28px; mask-image: radial-gradient(80% 80% at 50% 55%, #000 30%, transparent 100%); }
+  .gz .halo { position: absolute; top: -30%; left: 50%; transform: translateX(-50%); width: 70%; height: 60%; background: radial-gradient(50% 50% at 50% 50%, rgba(120,140,255,.28), transparent 70%); }
+  .gz .word { position: relative; color: #fff; font-size: 34px; font-weight: 800; letter-spacing: 3px; }
+  .gz .word em { font-style: normal; background: linear-gradient(90deg, #9db4ff, #e8e8ff); -webkit-background-clip: text; background-clip: text; color: transparent; }
+  .gz .sub { position: absolute; bottom: 14%; color: #888; font-size: 11px; letter-spacing: 4px; }
+  /* ---- ⑩ Aceternity 发光渐变 ---- */
+  .ac { background: #080814; position: relative; overflow: hidden; }
+  .ac .spot { position: absolute; top: -40%; left: 20%; width: 60%; height: 120%; background: conic-gradient(from 200deg at 50% 0%, transparent 0deg, rgba(99,102,241,.30) 40deg, transparent 90deg); filter: blur(6px); }
+  .ac .glass { position: absolute; left: 14%; right: 14%; bottom: 18%; border: 1px solid rgba(255,255,255,.14); background: rgba(255,255,255,.06); backdrop-filter: blur(4px); border-radius: 12px; padding: 12px 16px; }
+  .ac .gt { font-size: 24px; font-weight: 800; background: linear-gradient(90deg, #a5b4fc, #f0abfc 55%, #67e8f9); -webkit-background-clip: text; background-clip: text; color: transparent; }
+  .ac .dot { position: absolute; width: 5px; height: 5px; border-radius: 50%; background: #fff; box-shadow: 0 0 8px 2px rgba(165,180,252,.9); }
+  .ac .d1 { right: 24%; top: 26%; } .ac .d2 { right: 15%; top: 52%; opacity: .6; }
+  /* ---- ⑪ Rough.js 草图黑板 ---- */
+  .rk { background: #243b32; padding: 6% 8%; position: relative; }
+  .rk svg { width: 100%; height: 100%; }
+  .rk .chalk { color: #f5f2e8; font-size: 19px; font-weight: 700; letter-spacing: 2px; }
+  /* ---- ⑫ 数据大屏（ECharts 生态）---- */
+  .db { background: linear-gradient(180deg, #071a33 0%, #0a2547 100%); padding: 5% 6%; position: relative; }
+  .db .panel { position: absolute; border: 1px solid rgba(80,180,255,.35); background: linear-gradient(180deg, rgba(20,60,110,.55), rgba(10,35,70,.35)); border-radius: 4px; }
+  .db .p1 { left: 5%; top: 14%; width: 26%; height: 34%; }
+  .db .p2 { right: 5%; top: 14%; width: 26%; height: 34%; }
+  .db .p3 { left: 5%; bottom: 10%; width: 26%; height: 26%; }
+  .db .p4 { right: 5%; bottom: 10%; width: 26%; height: 26%; }
+  .db .ttl { position: absolute; top: 5%; left: 50%; transform: translateX(-50%); color: #cfe8ff; font-size: 14px; font-weight: 800; letter-spacing: 3px; text-shadow: 0 0 12px rgba(80,180,255,.8); }
+  .db .corner { position: absolute; width: 10px; height: 10px; border-color: #4fd8ff; border-style: solid; }
 </style>
 </head>
 <body>
 <div class="wrap">
-  <h1>代码画视频 · 7 种风格样板</h1>
-  <p class="lead">Agent 做视频前，把本页展示给用户选风格。所有画面由代码绘制（Remotion 落地），零图片素材、零模型文件，渲染成 MP4。点击卡片右上角「选这个」高亮你的选择。</p>
+  <h1>代码画视频 · 12 种风格样板</h1>
+  <p class="lead">Agent 做视频前，把本页展示给用户选风格。①–⑦ 为基础风格，⑧–⑫ 衍生自高质量开源项目（Geist / neobrutalism.dev / Aceternity UI / roughjs / ECharts）。所有画面由代码绘制（Remotion 落地），零图片素材、零模型文件，渲染成 MP4。点击卡片右上角「选这个」高亮你的选择。</p>
   <div class="howto">
     <b>Agent 使用说明（BLOCKING）</b>：项目一开始就 present 本页让用户做两选一——
     <b>① 手动指定</b>：用户点某张卡片选风格；<b>② AI 自动匹配</b>：用户点首屏深色卡（或说「自动」），
@@ -104,7 +138,11 @@
           <tr><td>空间结构 / 机械原理 / 产品拆解</td><td>④ 3D 风</td></tr>
           <tr><td>工具教程 / 效率演示 / 软件评测</td><td>⑤ 产品宣传片风</td></tr>
           <tr><td>年鉴式数据梳理 / 调研报告可视化</td><td>⑥ 知识科普（印刷排版）风</td></tr>
-          <tr><td>强观点输出 / 快节奏混剪 / 开场炸场</td><td>⑦ 自由发挥风</td></tr>
+          <tr><td>强观点输出 / 快节奏混剪 / 开场炸场</td><td>⑦ 自由发挥 / ⑧ Neo-Brutalism</td></tr>
+          <tr><td>开发者话题 / AI / 科技深度内容</td><td>⑨ Geist 暗色极简风</td></tr>
+          <tr><td>高端产品叙事 / AI 主题 / 未来感</td><td>⑩ Aceternity 发光渐变风</td></tr>
+          <tr><td>课堂讲解 / 轻松吐槽 / 草稿标注</td><td>⑪ Rough.js 草图黑板风</td></tr>
+          <tr><td>数据盘点 / 榜单 / 年度总结 / 行业报告</td><td>⑫ 数据大屏风</td></tr>
         </table>
       </div>
     </div>
@@ -228,6 +266,90 @@
         <h2><span class="no">07</span>自由发挥（自由动效）风</h2>
         <p>黑 / 米白 / 一亮橙，每幕换一种动效手法（大字拆组、图形变形、粒子、镜头穿越），开场 1 秒必动。适合：观点输出、开场炸场、混剪。</p>
         <span class="tagline">每幕一个手法 + 切点全部卡拍</span>
+      </div>
+    </div>
+    <!-- ⑧ -->
+    <div class="card">
+      <div class="preview nb">
+        <div class="blk b1">别再卷了！</div>
+        <div class="blk b2">三个真相</div>
+        <div class="star"></div>
+        <div class="tape">NO GRADIENTS</div>
+        <button class="pick">选这个</button>
+      </div>
+      <div class="meta">
+        <h2><span class="no">08</span>Neo-Brutalism 新粗野主义 <span style="font-size:11px;color:var(--sub);font-weight:400">开源：neobrutalism.dev（MIT）</span></h2>
+        <p>粗黑边框 + 硬阴影（禁模糊禁渐变）+ 高饱和撞色 + 特大号无衬线。适合：观点输出、争议话题、年轻化品牌、开场炸场。</p>
+        <span class="tagline">border 4px + box-shadow 硬偏移 + 撞色块</span>
+      </div>
+    </div>
+    <!-- ⑨ -->
+    <div class="card">
+      <div class="preview gz">
+        <div class="grid"></div><div class="halo"></div>
+        <div class="word">SHIP <em>FASTER</em></div>
+        <div class="sub">DEVELOP. PREVIEW. SHIP.</div>
+        <button class="pick">选这个</button>
+      </div>
+      <div class="meta">
+        <h2><span class="no">09</span>Geist 暗色极简风 <span style="font-size:11px;color:var(--sub);font-weight:400">开源：vercel/geist 设计系统</span></h2>
+        <p>纯黑底 + 白大字 + 细网格渐隐 + 单色辉光，克制到极致的高对比。适合：开发者话题、AI/科技深度内容、产品发布。</p>
+        <span class="tagline">网格 mask 渐隐 + 径向辉光 + 渐变字</span>
+      </div>
+    </div>
+    <!-- ⑩ -->
+    <div class="card">
+      <div class="preview ac">
+        <div class="spot"></div>
+        <span class="dot d1"></span><span class="dot d2"></span>
+        <div class="glass"><div class="gt">未来已来</div>
+          <div style="font-size:11px;color:#8b8ba8;margin-top:4px;">Spotlight · 渐变文字 · 玻璃拟态</div></div>
+        <button class="pick">选这个</button>
+      </div>
+      <div class="meta">
+        <h2><span class="no">10</span>Aceternity 发光渐变风 <span style="font-size:11px;color:var(--sub);font-weight:400">开源：Aceternity UI（shadcn 生态）</span></h2>
+        <p>聚光灯锥形光束 + 渐变大字 + 玻璃卡片 + 星点微光。适合：高端产品叙事、AI 主题、未来感盘点。</p>
+        <span class="tagline">conic 聚光 + background-clip 渐变字 + 玻璃层</span>
+      </div>
+    </div>
+    <!-- ⑪ -->
+    <div class="card">
+      <div class="preview rk">
+        <svg viewBox="0 0 320 180">
+          <path d="M42 130 Q120 122 278 128" fill="none" stroke="#f5f2e8" stroke-width="2.6" stroke-linecap="round"/>
+          <path d="M43 133 Q120 126 277 131" fill="none" stroke="#f5f2e8" stroke-width="1.2" stroke-linecap="round" opacity=".5"/>
+          <circle cx="160" cy="72" r="34" fill="none" stroke="#f5f2e8" stroke-width="2.2" stroke-dasharray="7 5" stroke-linecap="round"/>
+          <path d="M150 74 q4 -12 12 -6 q6 4 2 10" fill="none" stroke="#ffe08a" stroke-width="2.4" stroke-linecap="round"/>
+          <path d="M236 46 l14 -8 M240 52 l16 -2" stroke="#f5f2e8" stroke-width="2" stroke-linecap="round"/>
+          <text x="196" y="42" fill="#ffe08a" font-size="15" font-weight="700" transform="rotate(-6 196 42)">3x!</text>
+        </svg>
+        <div class="chalk" style="position:absolute; left:7%; top:12%;">草稿板笔记风</div>
+        <button class="pick">选这个</button>
+      </div>
+      <div class="meta">
+        <h2><span class="no">11</span>Rough.js 草图黑板风 <span style="font-size:11px;color:var(--sub);font-weight:400">开源：roughjs（MIT）</span></h2>
+        <p>潦草手绘线条 + 粉笔标注 + 虚线圈重点，黑板/牛皮纸底。适合：课堂讲解、轻松吐槽、数据标注强调。</p>
+        <span class="tagline">rough 双描边 + 虚线圈 + 手写体标注</span>
+      </div>
+    </div>
+    <!-- ⑫ -->
+    <div class="card">
+      <div class="preview db">
+        <div class="panel p1"></div><div class="panel p2"></div><div class="panel p3"></div><div class="panel p4"></div>
+        <div class="ttl">2026 数据盘点</div>
+        <span class="corner" style="left:5%;top:14%;border-width:2px 0 0 2px;"></span>
+        <span class="corner" style="right:5%;top:14%;border-width:2px 2px 0 0;"></span>
+        <svg viewBox="0 0 320 180" style="position:absolute;inset:0;width:100%;height:100%;">
+          <polyline points="40,120 80,100 120,110 160,78 200,88 240,60 280,66" fill="none" stroke="#4fd8ff" stroke-width="2.4" style="filter: drop-shadow(0 0 5px rgba(79,216,255,.9));"/>
+          <polyline points="40,132 80,124 120,128 160,112 200,120 240,100 280,108" fill="none" stroke="#7c9dff" stroke-width="1.8" opacity=".7"/>
+          <circle cx="240" cy="60" r="4" fill="#fff" style="filter: drop-shadow(0 0 6px rgba(79,216,255,1));"/>
+        </svg>
+        <button class="pick">选这个</button>
+      </div>
+      <div class="meta">
+        <h2><span class="no">12</span>数据大屏风 <span style="font-size:11px;color:var(--sub);font-weight:400">开源：ECharts 生态（Apache-2.0）</span></h2>
+        <p>深蓝底 + 发光折线 + 四角科技边框 + 面板分区。适合：数据盘点、榜单发布、年度总结、行业报告。</p>
+        <span class="tagline">发光 polyline + 面板网格 + 角标装饰</span>
       </div>
     </div>
   </div>
