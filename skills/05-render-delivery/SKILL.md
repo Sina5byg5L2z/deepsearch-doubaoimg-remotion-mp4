@@ -68,11 +68,22 @@ node render-monitor/server.mjs --dir <渲染日志目录> --port 8788
 - **前台看护器 `scripts/watch-bg.mjs`**（零依赖）：不是 sleep 空等，而是每 2s 检查
   「日志新增行 + 进程存活」两个事实——命中成功/失败标记即定论退出；进程退出无成功标记 = 失败；
   日志 `--hang-seconds` 无增长且进程存活 = 卡死；全局超时 = 卡死。退出码 0/1/2/3。
+- **周期健康检查（用户硬规则 2026-10-10：后台启动后必须隔一段时间确认"正常运行"，正常才能下一步）**：
+  `--check-every <秒>` 开启检查点——每个检查点判定：进程存活？`--progress "<捕获组正则>"`
+  的进度计数有没有推进（如 Remotion `"Rendered ([0-9]+)/"`）？日志字节有没有增长？
+  正常 → 输出 `BG_HEALTHY`（进 watcher 日志）；连续 `--stall-limit`（默认 2）个检查点
+  无进展 → `BG_HANG progress-stalled`，立即定论处理，**不许等任务自然结束**。
+  已验证输出序列：`BG_HEALTHY check@2s progress=20 → ... → BG_SUCCESS`；
+  停滞时 `BG_STALLED ... → BG_HANG progress-stalled`（exit=2）。
+- **Windows PID 坑**：Git Bash 的 `$$` 是 MSYS 模拟 PID，`process.kill(pid,0)` 查不到 →
+  **bash 后台任务不要写 .pid 文件**，watcher 用 `--pid none`（靠标记+卡死+停滞检测兜底）；
+  **Node 后台任务写 `process.pid` 才是真实 Windows PID**，`--pid-file` 可用。
 
   ```bash
   # 短任务（<10 分钟）：前台阻塞到定论，一条命令拿结果
-  node watch-bg.mjs --log out/task.log --pid-file out/task.log.pid \
-    --success "BG_SUCCESS" --fail "BG_FAIL" --hang-seconds 120 --timeout 3600
+  node watch-bg.mjs --log out/task.log --pid none \
+    --success "BG_SUCCESS" --fail "BG_FAIL" \
+    --check-every 60 --progress "Rendered ([0-9]+)/" --timeout 3600
   # 长任务：watcher 本身后台运行，它的退出通知即最终裁决（裁决行带 BG_SUCCESS/BG_FAIL/BG_HANG），
   # Agent 只读一次日志尾部，不轮询、不转述过程。
   ```
