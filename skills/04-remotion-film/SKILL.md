@@ -72,6 +72,13 @@ node node_modules/@remotion/cli/remotion-cli.js render src/index.js Film out/ful
 从 google/fonts GitHub 下载 ttf 到 `public/fonts/`，组件里用 `FontFace + delayRender/continueRender`
 阻塞加载，**catch 分支里也必须 continueRender**（否则渲染卡死）。
 
+## Prompt 模板库（在线）
+
+Remotion 官方维护的社区提示词画廊：**https://remotion.dev/prompts**（点赞排序、一键复制，
+含地图动画/新闻高亮/产品 Demo/数据图表/歌词视频等 21+ 条实战提示词）。
+做特定类型视频前先找同类模板改内容。GitHub 整理镜像：
+https://github.com/Quriosity-agent/remotion-prompts（含中文分类版）。
+
 ## 冒烟测试
 
 写完工程先渲 `--frames=0-90` 出完整 mp4（含封装步），浏览器预览不报错不算数。
