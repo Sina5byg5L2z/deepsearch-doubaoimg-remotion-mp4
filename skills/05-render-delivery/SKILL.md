@@ -57,39 +57,37 @@ node render-monitor/server.mjs --dir <渲染日志目录> --port 8788
 ```
 自动发现目录里最新 render*.log，解析 "Rendered N/M, time remaining" 与 *_EXIT 标记。
 
-## 后台任务标记与前台看护（用户硬规则 2026-10-10，取代"等通知/sleep/聊天轮询"）
+## 后台任务标准流程（唯一方式，2026-10-10 定稿）
 
-- **所有后台任务（渲染/生图/TTS/批处理）禁止向对话输出过程信息**——进度只存在于日志与监控网页。
-- **后台任务必须在日志里以独特标记收尾**（定论唯一、可 grep）：
-  - 成功：`BG_SUCCESS <任务名> output=<产物路径>`
-  - 失败：`BG_FAIL <任务名> reason=<一句话>`
-  - bash 包装模板：`cmd > task.log 2>&1; rc=$?; [ $rc -eq 0 ] && echo "BG_SUCCESS task output=..." || echo "BG_FAIL task rc=$rc"`
-  - 任务启动时把自身 PID 写 `<日志路径>.pid`（node: `fs.writeFileSync(p, String(process.pid))`；bash: `echo $$ > p`）
-- **前台看护器 `scripts/watch-bg.mjs`**（零依赖）：不是 sleep 空等，而是每 2s 检查
-  「日志新增行 + 进程存活」两个事实——命中成功/失败标记即定论退出；进程退出无成功标记 = 失败；
-  日志 `--hang-seconds` 无增长且进程存活 = 卡死；全局超时 = 卡死。退出码 0/1/2/3。
-- **周期健康检查（用户硬规则 2026-10-10：后台启动后必须隔一段时间确认"正常运行"，正常才能下一步）**：
-  `--check-every <秒>` 开启检查点——每个检查点判定：进程存活？`--progress "<捕获组正则>"`
-  的进度计数有没有推进（如 Remotion `"Rendered ([0-9]+)/"`）？日志字节有没有增长？
-  正常 → 输出 `BG_HEALTHY`（进 watcher 日志）；连续 `--stall-limit`（默认 2）个检查点
-  无进展 → `BG_HANG progress-stalled`，立即定论处理，**不许等任务自然结束**。
-  已验证输出序列：`BG_HEALTHY check@2s progress=20 → ... → BG_SUCCESS`；
-  停滞时 `BG_STALLED ... → BG_HANG progress-stalled`（exit=2）。
-- **Windows PID 坑**：Git Bash 的 `$$` 是 MSYS 模拟 PID，`process.kill(pid,0)` 查不到 →
-  **bash 后台任务不要写 .pid 文件**，watcher 用 `--pid none`（靠标记+卡死+停滞检测兜底）；
-  **Node 后台任务写 `process.pid` 才是真实 Windows PID**，`--pid-file` 可用。
+四条路径已实测验证（成功/失败/卡死/健康门）：
 
-  ```bash
-  # 短任务（<10 分钟）：前台阻塞到定论，一条命令拿结果
-  node watch-bg.mjs --log out/task.log --pid none \
-    --success "BG_SUCCESS" --fail "BG_FAIL" \
-    --check-every 60 --progress "Rendered ([0-9]+)/" --timeout 3600
-  # 长任务：watcher 本身后台运行，它的退出通知即最终裁决（裁决行带 BG_SUCCESS/BG_FAIL/BG_HANG），
-  # Agent 只读一次日志尾部，不轮询、不转述过程。
-  ```
+```
+① 提交     run_in_background 跑任务，日志重定向到唯一文件；
+           任务收尾必须输出标记：成功 echo "BG_SUCCESS <任务> output=<路径>"
+                               失败 echo "BG_FAIL <任务> reason=<一句话>"
+② 健康门   前台跑一次 watcher 确认"正常运行"，通过才允许下一步：
+           node scripts/watch-bg.mjs --log task.log --gate --check-every 5 \
+             --progress "Rendered ([0-9]+)/"
+           输出 BG_HEALTHY gate-passed（exit 0）→ 才进入下一步；
+           BG_FAIL / BG_HANG → 立即读日志尾部定位处理，不许带病继续
+③ 终局     健康门通过后，watcher 不加 --gate 再挂后台跟到结束——
+           它的退出通知就是最终定论（成功/失败/卡死三选一，永远不会"不知道"）
+④ 渲染类   照旧同时开监控网页（见上节）
+```
 
-- 上一节的 `rend()` 看门狗保留用于 Remotion 渲染链（它本身就是前台检测日志标记的阻塞函数）；
-  其余一切新写的后台任务一律用 watch-bg.mjs。
+规则：
+
+- **所有后台任务必须带收尾标记**——没有 BG_SUCCESS/BG_FAIL 的后台任务 = 违规，不许提交。
+- **全程禁止**：向对话转述过程信息、sleep、手动轮询。过程只在日志和监控网页里。
+- watcher 检测的都是事实：日志新增行（标记/进度计数）+ 日志是否在增长。
+  默认参数 `--check-every 15 --hang-seconds 90 --stall-limit 2`（渲染建议
+  `--progress "Rendered ([0-9]+)/"`）；健康门建议 `--check-every 5 --timeout 300`。
+- 定论只有三种，永远不会"不知道"：`BG_SUCCESS`（exit 0）/ `BG_FAIL`（exit 1）/ `BG_HANG`（exit 2，
+  含：日志无增长、进度连续停滞、全局超时）。异常的唯一动作 = 读日志尾部定位原因。
+- **不做 PID 检测**（Windows 下 bash/Node/PowerShell 的 PID 语义互不兼容，坑大于收益）：
+  存活 = 日志仍在增长；静默死亡会判 BG_HANG，处理动作与失败相同。
+- Remotion 渲染链的 `rend()` 看门狗保留（它就是前台检测日志标记的阻塞函数）；
+  其余一切后台任务一律走 watch-bg.mjs。
 
 ## 失败恢复（禁止直接重渲）
 
