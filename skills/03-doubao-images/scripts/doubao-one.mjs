@@ -27,7 +27,10 @@ const getImgs = () => page.evaluate(() => {
   return out;
 });
 
+// before 快照双拍取并集（间隔 4s）：上一轮晚加载的图也计入 before，防止被算成本轮新图（串图根因之一）
 const before = new Set(await getImgs());
+await page.waitForTimeout(4000);
+for (const s of await getImgs()) before.add(s);
 
 const input = page.locator('[contenteditable="true"]').first();
 const ta = page.locator('textarea').first();
@@ -39,17 +42,27 @@ await page.waitForTimeout(600);
 await page.keyboard.press('Enter');
 console.log('SENT', PREFIX);
 
-// 轮询：「停止生成」消失 + 有新图 URL 出现，双条件才算完成
+// 轮询：三条件全满足才算完成——
+// ① 「停止生成」消失 ② 有新图 ③ 新图集连续 3 轮（约 15s）无变化（图片集稳定）
+// 只看首图就退出会让本轮 8 宫格剩余图片晚到、被下一轮误认为自己的新图（串图根因之二）
 let done = false;
+let prevKey = '';
+let stable = 0;
 for (let i = 0; i < 40; i++) {
   await page.waitForTimeout(5000);
   let gen = true;
   try { gen = await page.evaluate(() => document.body.innerText.includes('停止生成')); } catch {}
-  if (!gen) {
-    const now = await getImgs();
-    if (now.some(s => !before.has(s))) { done = true; break; }
+  const now = await getImgs();
+  const fresh = now.filter(s => !before.has(s));
+  const key = fresh.join('|');
+  if (!gen && fresh.length > 0) {
+    stable = key === prevKey ? stable + 1 : 1;
+    if (stable >= 3) { done = true; break; }
+  } else {
+    stable = 0;
   }
-  console.log('poll', i + 1, 'generating=', gen);
+  prevKey = key;
+  console.log('poll', i + 1, 'generating=', gen, 'fresh=', fresh.length, 'stable=', stable);
 }
 if (!done) { console.log('TIMEOUT'); process.exit(2); }
 
