@@ -30,6 +30,8 @@ film/
 ## timeline.json 构建器（核心中间层）
 
 - 输入：`durations.json`（TTS 实测时长）+ 每段字幕 JSON
+  （字幕 t 推荐先用 02 号 skill 的 `align-subs.mjs` 按音频实测对齐，
+  估算 t 也能跑，但句级字幕会有早出/晚出偏差）
 - 输出：`{ fps, durationInFrames, segments: [{id, fromF, durF, from, dur, audioOffsetMs, chapter}], subtitles: [{from, to, lines}], chapters, total, audio: {voiceEndSec, padToSec} }`
 - **一切时间量化到整数帧**：片头留白、段间呼吸（0.55s）、每段 from/dur 在输出前全部经过
   `Math.round(sec * FPS)` 落到帧网格（FPS 环境变量可配，默认 30，必须与 Composition 一致）

@@ -22,7 +22,7 @@ description: |
 | `视频文案.md` | 分幕口播文案 | 人审 + TTS |
 | `分镜表.md` | 镜号/时长/画面事件/插画需求 | 质量基线 |
 | `prompts.txt` | `场景ID\|插画提示词` 每行一条 | 豆包生图 |
-| `subs/s01.json…` | 每段逐句字幕 `[{t, text}]`（t=段内秒偏移） | Remotion 字幕 |
+| `subs/s01.json…` | 每段逐句字幕 `[{t, text}]`（t=段内秒偏移；TTS 后经 align-subs 实测对齐） | Remotion 字幕 |
 | `发布信息包.md` | 标题/简介/标签/发布时段 | 最终交付 |
 
 ## 文案写作纪律
@@ -109,5 +109,13 @@ Q版漫画人物，构图简洁大量留白。
   两者不一致（坏头/VBR 封装）以 ffprobe 为准。时长错了，下游 timeline 与混音全错位。
 - 同批 TTS 的首尾静音处理必须一致：要么全部不裁（留 TTS 原生静音），
   要么全部按同一参数裁（如 ffmpeg silenceremove）——混着来会逐段积累偏移。
+- **字幕句级强制对齐（TTS 合成后必做）**：`subs/*.json` 里的 t 是按 4–4.5 字/秒估算的，
+  与 TTS 实际语速存在句级偏差。用 [`scripts/align-subs.mjs`](scripts/align-subs.mjs)
+  以音频静音间隙反推每句真实起点：
+  `node align-subs.mjs --tts tts/ --subs subs/`（输出 `subs-aligned/`，
+  格式不变 `[{t,text}]`，Remotion 侧零改动）。
+  三级策略自动选择：区间==句数逐句 1:1（最准）→ 合并最小间隙 → 按字数分摊兜底。
+  对齐后的 t 是实测值，字幕早出/晚出问题在此根治；跑完看每段 maxΔ，
+  超过 1s 的段人工核对句数与停顿是否匹配。
 - **timeline 的段落时长以 TTS 实测时长为准**，不是文案字数估算。
 - 多段 TTS 音色漂移的根治：用 voiceclone（参考音频锁音色），或全片用同一预置音色。

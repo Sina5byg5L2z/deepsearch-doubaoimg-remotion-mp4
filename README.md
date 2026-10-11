@@ -19,7 +19,7 @@
 | 目录 | 阶段 | 核心内容 |
 |---|---|---|
 | [`skills/01-research`](skills/01-research/SKILL.md) | 深度调研 | 8 步法、事实卡片、子 Agent 并行调研（按子问题分工，主线程只收摘要）、独立 Agent 校验、专名零容忍、三层确定性标注 |
-| [`skills/02-script`](skills/02-script/SKILL.md) | 文案与分镜 | 视频文案结构、钩子五类选型、台词节奏硬指标（4–4.5 字/秒）、三种叙事骨架、写完六项自检、分镜表、字幕稿、TTS 时长表、场景提示词规划 |
+| [`skills/02-script`](skills/02-script/SKILL.md) | 文案与分镜 | 视频文案结构、钩子五类选型、台词节奏硬指标（4–4.5 字/秒）、三种叙事骨架、写完六项自检、分镜表、字幕稿、TTS 时长表、字幕句级强制对齐（silencedetect 反推真实起点）、场景提示词规划 |
 | [`skills/03-doubao-images`](skills/03-doubao-images/SKILL.md) | 插画生成 | 豆包 CDP 自动化脚本、批量重试、插画提示词模板、水印裁剪 |
 | [`skills/04-remotion-film`](skills/04-remotion-film/SKILL.md) | 视频合成 | 工程结构、timeline 构建器、12 种风格样板（7 基础 + 5 个开源项目衍生：Geist/Neo-Brutalism/Aceternity/roughjs/ECharts）、剪辑手法强化指南 |
 | [`skills/05-render-delivery`](skills/05-render-delivery/SKILL.md) | 渲染交付 | 渲染前检查清单、日志看门狗、监控网页、ffmpeg 混音封装坑、抽帧 QA、发布包 |
