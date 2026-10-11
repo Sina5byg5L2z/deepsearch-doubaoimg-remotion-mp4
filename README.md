@@ -32,7 +32,7 @@
 - **插画侧**：豆包免费生图 + 常驻 Chrome CDP 全自动（登录一次、后续零人工）、提示词强制「画面无文字」、ffmpeg 裁水印
 - **合成侧**：反 AI 味剪辑纪律（每 1.5–3s 一个视觉事件、3 层视差、禁 linear、stagger 进场、声画同步）
 - **渲染侧**：TEMP 指持久目录防白跑、日志看门狗自动 kill 挂起的 node（Windows 下 Remotion 渲完不退出）、pre-encode.mp4 失败回收、渲染监控网页、抽帧 QA 硬环节
-- **音频侧**：ffmpeg `adelay` 替代 `amix` 的 itsoffset 陷阱、两遍 loudnorm、TTS 音色漂移的根治方案
+- **音频侧**：帧量化 timeline（视频/音频同一组整数帧，机制上排除漂移）、混音偏移单一来源（直接读 timeline.json，禁止重新累加）、ffmpeg `adelay` 替代 `amix` 的 itsoffset 陷阱、两遍 loudnorm、TTS 音色漂移的根治方案
 
 ## 快速开始
 

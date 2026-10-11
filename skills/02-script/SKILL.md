@@ -104,6 +104,10 @@ Q版漫画人物，构图简洁大量留白。
 
 ## TTS 与时长表
 
-- 逐段合成 TTS 后解析 WAV 头取时长，输出 `durations.json`（`{"s01": 8.2, "s02": 11.7, ...}`）。
+- 逐段合成 TTS 后实测时长，输出 `durations.json`（`{"s01": 8.2, "s02": 11.7, ...}`）。
+- **时长以解码实测为准**：WAV 头解析结果要用 `ffprobe -show_entries format=duration` 复核，
+  两者不一致（坏头/VBR 封装）以 ffprobe 为准。时长错了，下游 timeline 与混音全错位。
+- 同批 TTS 的首尾静音处理必须一致：要么全部不裁（留 TTS 原生静音），
+  要么全部按同一参数裁（如 ffmpeg silenceremove）——混着来会逐段积累偏移。
 - **timeline 的段落时长以 TTS 实测时长为准**，不是文案字数估算。
 - 多段 TTS 音色漂移的根治：用 voiceclone（参考音频锁音色），或全片用同一预置音色。

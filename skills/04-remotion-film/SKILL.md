@@ -30,9 +30,25 @@ film/
 ## timeline.json 构建器（核心中间层）
 
 - 输入：`durations.json`（TTS 实测时长）+ 每段字幕 JSON
-- 输出：`{ segments: [{id, from, dur, chapter}], subtitles: [{from, to, lines}], chapters, total }`
-- **段落时长 = TTS 实测时长 + 固定段间呼吸（如 0.55s）**，总时长据此推算
+- 输出：`{ fps, durationInFrames, segments: [{id, fromF, durF, from, dur, audioOffsetMs, chapter}], subtitles: [{from, to, lines}], chapters, total, audio: {voiceEndSec, padToSec} }`
+- **一切时间量化到整数帧**：片头留白、段间呼吸（0.55s）、每段 from/dur 在输出前全部经过
+  `Math.round(sec * FPS)` 落到帧网格（FPS 环境变量可配，默认 30，必须与 Composition 一致）
+- **段落时长 = TTS 实测时长**（帧量化后）+ 段间呼吸，总时长据此推算
 - 中文字幕自动换行：标点优先断行、数字/小数点/省略号不拆开（完整实现见 `examples/build-timeline.mjs`）
+
+## 声画同步硬规则（违者必出不同步）
+
+1. **单一时间源**：视频 Sequence 和音频 adelay 都消费 timeline.json，
+   **禁止用 durations.json 重新累加偏移**——漏掉片头留白 0.4s = 全片恒定偏移；
+   段间呼吸取值与 timeline 不一致 = 逐段累计漂移（越到后面偏得越多）。
+2. **视频侧用整数帧**：`<Sequence from={s.fromF} durationInFrames={s.durF}>`，
+   Composition `durationInFrames={tl.durationInFrames}`；不要从秒值再乘 fps（浮点往返有误差）。
+3. **音频侧用 audioOffsetMs**：混音偏移直接读 `segments[].audioOffsetMs`（已做整数帧→毫秒换算），
+   混音脚本见 05 号 skill 的 `build-audio-mix.mjs`。
+4. **音频必须比视频长**：timeline 的 `audio.padToSec` = 视频总长 + 1s，
+   混音补静音到该长度后再与 `--muted` 视频封装——否则 `-shortest` 会把视频结尾裁掉。
+5. **交付前核对三长**：`ffprobe` 成片总时长 ≈ timeline.total（±0.2s）；
+   混音时长 == padToSec；语音结束点（voiceEndSec）处人声已收尾。
 
 ## 渲染入口与基本参数
 

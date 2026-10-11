@@ -113,15 +113,24 @@ node render-monitor/server.mjs --dir <渲染日志目录> --port 8788
 
 ## 混音与封装（ffmpeg 硬坑）
 
+- **偏移单一来源**：多段 TTS 的定位偏移必须直接读 timeline.json 的
+  `segments[].audioOffsetMs`（整数帧换算，与视频 Sequence 同源）。
+  **禁止用 durations.json 重新累加**——漏片头留白 = 全片恒定偏移，
+  段间呼吸取值不一致 = 逐段累计漂移。
+  混音脚本用 [`scripts/build-audio-mix.mjs`](scripts/build-audio-mix.mjs)：
+  自动校验偏移与帧对齐、adelay 定位、补静音到视频总长 +1s、可选 BGM 闪避、
+  两遍 loudnorm，输出前自带时长校验（`SYNC_CHECK_OK` 才算过）。
 - `amix` 会忽略 `-itsoffset`（所有输入被对齐到 0）——多段音频定位用
-  `[i:a]adelay=毫秒[n_i]` 再 amix。
+  `[i:a]adelay=毫秒:all=1[n_i]` 再 amix（`normalize=0`，各段不重叠时保原电平）。
+- **音频必须补静音到比视频长**（`apad=whole_dur=总长+1s`），否则 `-shortest`
+  会把视频结尾裁掉——语音结束在总长前 GAP+尾巴 秒，这是设计好的尾部留白，不能被截。
 - 分段拼接：每段单独 `-ss/-t` 切割重编码 → 多输入 filter_complex concat 流式重编码。
   **concat demuxer -c copy 对 Remotion 输出时长会虚标**；单输入多 trim 分支会爆内存。
-- `-shortest` 按探测时长截断，可能悄悄切掉视频尾——封装后必须
-  `ffprobe -show_entries format=duration` 核对总时长 == timeline 时长。
+- 封装后必须 `ffprobe -show_entries format=duration` 核对总时长 == timeline.total（±0.2s）；
+  偏了先查混音时长（应 == audio.padToSec）再查视频渲染帧数。
 - 成片响度两遍 loudnorm（先测 input_i/tp/lra，再带 measured 参数 `linear=true`，目标 I=−16 LUFS）；
   配乐在人声段自动闪避可用 `sidechaincompress`。
-- 渲染时 `--muted` 出无声视频，最后 `ffmpeg -i muted.mp4 -i mix.wav -map 0:v -map 1:a
+- 渲染时 `--muted` 出无声视频，最后 `ffmpeg -i muted.mp4 -i mix_full.wav -map 0:v -map 1:a
   -c:v copy -c:a aac -b:a 192k -shortest final.mp4` 封装（见 `scripts/post.sh`）。
 
 ## 抽帧 QA（硬环节，改完重渲再交付）
