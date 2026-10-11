@@ -14,6 +14,17 @@ OUT=$FILM/out
 cd "$WORKSPACE" || exit 1
 mkdir -p "$OUT"
 
+# ===== GPU 加速探测（有 N 卡 + ffmpeg 带 nvenc → 走 GPU，否则回落 CPU，保持开源通用）=====
+if command -v nvidia-smi >/dev/null 2>&1 && ffmpeg -hide_banner -encoders 2>/dev/null | grep -q h264_nvenc; then
+  VENC=(-c:v h264_nvenc -preset p4 -rc vbr -cq 19)   # NVENC：编码段提速数倍，-cq 对标 crf 18
+  RGL=(--gl=angle)                                    # Chrome 走 GPU 合成（渲帧收益因项目而异，需实测）
+  echo "GPU_ACCEL=on h264_nvenc+angle"
+else
+  VENC=(-c:v libx264 -preset faster -crf 18)
+  RGL=()
+  echo "GPU_ACCEL=off libx264"
+fi
+
 # 看门狗：渲染完成标记出现后自动 kill 挂起的 node（本机 Remotion 渲完不退出）
 rend() {
   local tag="$1" marker="$2" logf="$3"; shift 3
@@ -34,12 +45,12 @@ rend() {
 # 注意完成标记：日志行首带 ANSI 转义符，正则不能 ^ 锚定；用 ○ 行 + 文件名精确匹配
 rend RENDER_S31 "○.*fix-s31\.mp4" "$OUT/render-s31.log" \
   node node_modules/@remotion/cli/remotion-cli.js render $FILM/src/index.js Film "$OUT/fix-s31.mp4" \
-  --frames=30838-31190 --concurrency=10 --x264-preset=faster --muted
+  --frames=30838-31190 --concurrency=10 --x264-preset=faster --muted "${RGL[@]}"
 
-# 2. 拼接：主片 trim 到补渲点 + 尾段，双输入 filter_complex 重编码
+# 2. 拼接：主片 trim 到补渲点 + 尾段，双输入 filter_complex 重编码（编码器走 GPU 探测结果）
 ffmpeg -y -loglevel error -i "$OUT/film-muted.mp4" -i "$OUT/fix-s31.mp4" \
   -filter_complex "[0:v]trim=end_frame=30838,setpts=PTS-STARTPTS[a];[1:v]setpts=PTS-STARTPTS[b];[a][b]concat=n=2:v=1:a=0[v]" \
-  -map "[v]" -c:v libx264 -preset faster -crf 18 -pix_fmt yuv420p -an "$OUT/film-muted-v2.mp4" 2> "$OUT/splice.log"
+  -map "[v]" "${VENC[@]}" -pix_fmt yuv420p -an "$OUT/film-muted-v2.mp4" 2> "$OUT/splice.log"
 echo "SPLICE_EXIT=$?"
 echo -n "SPLICE_DURATION="
 ffprobe -v error -show_entries format=duration -of csv=p=0 "$OUT/film-muted-v2.mp4" 2>/dev/null

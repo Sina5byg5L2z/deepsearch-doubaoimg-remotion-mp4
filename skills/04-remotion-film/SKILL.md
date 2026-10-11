@@ -43,6 +43,21 @@ node node_modules/@remotion/cli/remotion-cli.js render src/index.js Film out/ful
 # --muted 渲染无声视频，音轨由 ffmpeg 后期混入（见 05 号 skill）
 ```
 
+## GPU 硬件加速（写 remotion.config.js 前必查）
+
+**配 config 前必须现场跑 `nvidia-smi` 查卡——不许假设这台机器没卡。**
+有卡就把硬件加速写进 config，渲染中途换参数 = 进度全废。
+
+```js
+// remotion.config.js —— 参数一律传字符串；不要 import 枚举（4.0.x 里不存在那个枚举）
+Config.setChromiumOpenGlRenderer('angle-egl');    // Chromium 走 GPU 合成
+Config.setHardwareAcceleration('if-possible');    // 硬件编码，不支持时自动回落
+```
+
+- **硬编开启后禁传 `--x264-preset`**——它只作用于 libx264 软编，硬编下传了无效还混淆调参。
+- 实测数据（2026-10-11，RTX 3050 Laptop）：同一工程全片渲染，无 GPU 2 小时 → 开硬件加速 15 分钟。
+- `nvidia-smi` 不存在的机器才跳过本节走纯 CPU（提速参数见 05 号 skill）。
+
 ## 剪辑手法纪律（必读）
 
 **动手写任何场景组件前，先读 [`references/editing-craft.md`](references/editing-craft.md)。**

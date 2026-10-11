@@ -22,6 +22,11 @@ description: |
 4. **冒烟测试覆盖全链路**：先渲 `--frames=0-90` 出完整 mp4（含封装/faststart 步），
    只看浏览器不报错不算数。
 5. **输出目录必须已存在**：`> 目录/log.txt` 重定向时目录不存在会静默失败、任务却显示完成。
+6. **GPU 必查（开局就要定的参数）**：渲染前现场跑 `nvidia-smi`，有卡则在 remotion.config.js 写
+   `setChromiumOpenGlRenderer('angle-egl')` + `setHardwareAcceleration('if-possible')`
+   （参数传字符串，4.0.x 没有那个枚举），硬编开启后禁传 `--x264-preset`。
+   **这是开局定的参数，渲染中途换 config = 进度全废。**
+   实测：同一工程全片渲染，无 GPU 2 小时 → 开硬件加速 15 分钟（2026-10-11，RTX 3050）。
 
 ## 日志看门狗（所有 remotion 调用必须带）
 
