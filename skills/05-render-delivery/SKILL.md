@@ -62,12 +62,13 @@ node render-monitor/server.mjs --dir <渲染日志目录> --port 8788
 ```
 自动发现目录里最新 render*.log，解析 "Rendered N/M, time remaining" 与 *_EXIT 标记。
 
-## 后台任务标准流程（唯一方式，2026-10-10 定稿）
+## 后台任务标准流程（唯一方式，2026-10-12 修订：不依赖任何推送通知）
 
-四条路径已实测验证（成功/失败/卡死/健康门）：
+继续 = 前台跑一条命令阻塞到日志出现退出标记才退出——前台命令 + 退出码是所有工具
+都有的能力，能否接收推送通知都能接力：
 
 ```
-① 提交     run_in_background 跑任务，日志重定向到唯一文件；
+① 提交     run_in_background（或任何可用的后台方式）跑任务，日志重定向到唯一文件；
            任务收尾必须输出标记：成功 echo "BG_SUCCESS <任务> output=<路径>"
                                失败 echo "BG_FAIL <任务> reason=<一句话>"
 ② 健康门   前台跑一次 watcher 确认"正常运行"，通过才允许下一步：
@@ -75,20 +76,26 @@ node render-monitor/server.mjs --dir <渲染日志目录> --port 8788
              --progress "Rendered ([0-9]+)/"
            输出 BG_HEALTHY gate-passed（exit 0）→ 才进入下一步；
            BG_FAIL / BG_HANG → 立即读日志尾部定位处理，不许带病继续
-③ 终局     健康门通过后，watcher 不加 --gate 再挂后台跟到结束——
-           它的退出通知就是最终定论（成功/失败/卡死三选一，永远不会"不知道"）
+③ 继续     需要结果时前台跑同一条命令（不加 --gate），阻塞到出定论：
+           node scripts/watch-bg.mjs --log task.log --timeout 3600 \
+             --progress "Rendered ([0-9]+)/"
+           出口只有四种，永远不会"不知道"：
+           BG_SUCCESS（exit 0）/ BG_FAIL（exit 1）/ BG_HANG（exit 2：日志停摆或始终未出现——
+           后者多半是重定向目录不存在或任务没起来，见渲染前清单第 5 条）/
+           BG_RUNNING（exit 4，到 --timeout 还在跑 → 重跑同一条命令继续等）
 ④ 渲染类   照旧同时开监控网页（见上节）
 ```
 
 规则：
 
+- **watcher 无状态**：每次启动从头扫一遍日志（代价可忽略），所以接力 = 重跑同一条命令。
+  工具前台时限短就把 `--timeout` 调小于自己的前台时限，BG_RUNNING 后重跑即可；
+  已出定论的任务重跑会立即返回（标记在日志里）。
 - **所有后台任务必须带收尾标记**——没有 BG_SUCCESS/BG_FAIL 的后台任务 = 违规，不许提交。
-- **全程禁止**：向对话转述过程信息、sleep、手动轮询。过程只在日志和监控网页里。
+- **全程禁止**：向对话转述过程信息、sleep 循环轮询。watcher 本身就是阻塞式单命令，不算轮询。
 - watcher 检测的都是事实：日志新增行（标记/进度计数）+ 日志是否在增长。
   默认参数 `--check-every 15 --hang-seconds 90 --stall-limit 2`（渲染建议
   `--progress "Rendered ([0-9]+)/"`）；健康门建议 `--check-every 5 --timeout 300`。
-- 定论只有三种，永远不会"不知道"：`BG_SUCCESS`（exit 0）/ `BG_FAIL`（exit 1）/ `BG_HANG`（exit 2，
-  含：日志无增长、进度连续停滞、全局超时）。异常的唯一动作 = 读日志尾部定位原因。
 - **不做 PID 检测**（Windows 下 bash/Node/PowerShell 的 PID 语义互不兼容，坑大于收益）：
   存活 = 日志仍在增长；静默死亡会判 BG_HANG，处理动作与失败相同。
 - Remotion 渲染链的 `rend()` 看门狗保留（它就是前台检测日志标记的阻塞函数）；
