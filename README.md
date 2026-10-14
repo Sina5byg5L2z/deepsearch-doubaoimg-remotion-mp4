@@ -18,17 +18,17 @@
 
 | 目录 | 阶段 | 核心内容 |
 |---|---|---|
-| [`skills/01-research`](skills/01-research/SKILL.md) | 深度调研 | 8 步法、事实卡片、子 Agent 并行调研（按子问题分工，主线程只收摘要）、独立 Agent 校验、专名零容忍、三层确定性标注 |
-| [`skills/02-script`](skills/02-script/SKILL.md) | 文案与分镜 | 视频文案结构、钩子五类选型、台词节奏硬指标（4–4.5 字/秒）、三种叙事骨架、写完六项自检、分镜表、字幕稿、TTS 时长表、字幕句级强制对齐（silencedetect 反推真实起点）、场景提示词规划 |
-| [`skills/03-doubao-images`](skills/03-doubao-images/SKILL.md) | 插画生成 | 豆包 CDP 自动化脚本、批量重试、插画提示词模板、水印裁剪 |
-| [`skills/04-remotion-film`](skills/04-remotion-film/SKILL.md) | 视频合成 | 工程结构、timeline 构建器、12 种风格样板（7 基础 + 5 个开源项目衍生：Geist/Neo-Brutalism/Aceternity/roughjs/ECharts）、剪辑手法强化指南 |
-| [`skills/05-render-delivery`](skills/05-render-delivery/SKILL.md) | 渲染交付 | 渲染前检查清单、日志看门狗、监控网页、ffmpeg 混音封装坑、抽帧 QA、发布包 |
+| [`skills/video-research`](skills/video-research/SKILL.md) | 深度调研 | 8 步法、事实卡片、子 Agent 并行调研（按子问题分工，主线程只收摘要）、独立 Agent 校验（每轮新增内容都校验）、专名零容忍、三层确定性标注、**初次交付即满维度（十维度清单）** |
+| [`skills/video-script`](skills/video-script/SKILL.md) | 文案与分镜 | 视频文案结构、钩子五类选型、台词节奏硬指标（4–4.5 字/秒）、三种叙事骨架、写完六项自检、分镜表、字幕稿、TTS 时长表、字幕句级强制对齐（silencedetect 反推真实起点）、场景提示词规划 |
+| [`skills/doubao-images`](skills/doubao-images/SKILL.md) | 插画生成 | 豆包 CDP 自动化脚本、批量重试、插画提示词模板、水印裁剪 |
+| [`skills/remotion-film`](skills/remotion-film/SKILL.md) | 视频合成 | 工程结构、timeline 构建器、12 种风格样板（7 基础 + 5 个开源项目衍生：Geist/Neo-Brutalism/Aceternity/roughjs/ECharts）、剪辑手法强化指南 |
+| [`skills/remotion-render-delivery`](skills/remotion-render-delivery/SKILL.md) | 渲染交付 | 渲染前检查清单、日志看门狗、监控网页、ffmpeg 混音封装坑、抽帧 QA、发布包 |
 
-每个 skill 目录里的 `SKILL.md` 都是独立可用的 Agent skill（含 frontmatter），既可以在一个 Agent 会话里按 01→05 串成完整流水线，也可以单独取用某一环。
+总入口编排层是 [`skills/research-to-video/SKILL.md`](skills/research-to-video/SKILL.md)。每个 skill 目录里的 `SKILL.md` 都是独立可用的 Agent skill（含 frontmatter），既可以在一个 Agent 会话里按 调研→文案→插画→合成→渲染 串成完整流水线，也可以单独取用某一环。
 
 ## 亮点：实战沉淀的硬规则（踩坑换来的）
 
-- **调研侧**：专名零容忍（译名必须回查原语逐字源）、「比如 X、Y」= 全集指令、下否定结论前必须验证假设的时间/范围限定词
+- **调研侧**：专名零容忍（译名必须回查原语逐字源）、「比如 X、Y」= 全集指令、下否定结论前必须验证假设的时间/范围限定词、**初次交付即满维度**（十维度清单自查，禁止等用户点名再补）、AI 伪 wiki 源甄别、修正轨迹只进审计档案正文保持干净
 - **插画侧**：豆包免费生图 + 常驻 Chrome CDP 全自动（登录一次、后续零人工）、提示词强制「画面无文字」、ffmpeg 裁水印
 - **合成侧**：反 AI 味剪辑纪律（每 1.5–3s 一个视觉事件、3 层视差、禁 linear、stagger 进场、声画同步）
 - **渲染侧**：TEMP 指持久目录防白跑、日志看门狗自动 kill 挂起的 node（Windows 下 Remotion 渲完不退出）、pre-encode.mp4 失败回收、渲染监控网页、抽帧 QA 硬环节
@@ -41,7 +41,7 @@ git clone https://github.com/Sina5byg5L2z/deepsearch-doubaoimg-remotion-mp4.git
 ```
 
 1. 把 `skills/` 下的各目录复制到你的 Agent 的 skills 目录（如 Claude Code 的 `~/.claude/skills/`）
-2. 按 [`SKILL.md`](SKILL.md)（总入口）的流程编排：给出一个选题 → **Agent 先展示 7 风格样板页，用户手动选风格或让 AI 按调研内容自动匹配（Step 0，BLOCKING）** → 再自动走完 5 个阶段 → 产出成片 + 发布包
+2. 按[`总入口`](skills/research-to-video/SKILL.md)的流程编排：给出一个选题 → **Agent 先展示 7 风格样板页，用户手动选风格或让 AI 按调研内容自动匹配（Step 0，BLOCKING）** → 再自动走完 5 个阶段 → 产出成片 + 发布包
 3. 豆包插画需要一次性准备：本机 Chrome + playwright-core，首次扫码登录豆包后登录态存在持久 profile 里，之后全自动
 
 ## 环境依赖

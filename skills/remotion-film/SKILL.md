@@ -30,7 +30,7 @@ film/
 ## timeline.json 构建器（核心中间层）
 
 - 输入：`durations.json`（TTS 实测时长）+ 每段字幕 JSON
-  （字幕 t 推荐先用 02 号 skill 的 `align-subs.mjs` 按音频实测对齐，
+  （字幕 t 推荐先用 [`video-script`](../video-script/SKILL.md) 的 `align-subs.mjs` 按音频实测对齐，
   估算 t 也能跑，但句级字幕会有早出/晚出偏差）
 - 输出：`{ fps, durationInFrames, segments: [{id, fromF, durF, from, dur, audioOffsetMs, chapter}], subtitles: [{from, to, lines}], chapters, total, audio: {voiceEndSec, padToSec} }`
 - **一切时间量化到整数帧**：片头留白、段间呼吸（0.55s）、每段 from/dur 在输出前全部经过
@@ -46,7 +46,7 @@ film/
 2. **视频侧用整数帧**：`<Sequence from={s.fromF} durationInFrames={s.durF}>`，
    Composition `durationInFrames={tl.durationInFrames}`；不要从秒值再乘 fps（浮点往返有误差）。
 3. **音频侧用 audioOffsetMs**：混音偏移直接读 `segments[].audioOffsetMs`（已做整数帧→毫秒换算），
-   混音脚本见 05 号 skill 的 `build-audio-mix.mjs`。
+   混音脚本见 [`remotion-render-delivery`](../remotion-render-delivery/SKILL.md) 的 `build-audio-mix.mjs`。
 4. **音频必须比视频长**：timeline 的 `audio.padToSec` = 视频总长 + 1s，
    混音补静音到该长度后再与 `--muted` 视频封装——否则 `-shortest` 会把视频结尾裁掉。
 5. **交付前核对三长**：`ffprobe` 成片总时长 ≈ timeline.total（±0.2s）；
@@ -58,7 +58,7 @@ film/
 node node_modules/@remotion/cli/remotion-cli.js render src/index.js Film out/full.mp4 \
   --concurrency=10 --x264-preset=faster --muted
 # .bin/remotion 是 sh 包装脚本，用 node 直接跑 cli 入口
-# --muted 渲染无声视频，音轨由 ffmpeg 后期混入（见 05 号 skill）
+# --muted 渲染无声视频，音轨由 ffmpeg 后期混入（见 remotion-render-delivery）
 ```
 
 ## GPU 硬件加速（写 remotion.config.js 前必查）
@@ -74,7 +74,7 @@ Config.setHardwareAcceleration('if-possible');    // 硬件编码，不支持时
 
 - **硬编开启后禁传 `--x264-preset`**——它只作用于 libx264 软编，硬编下传了无效还混淆调参。
 - 实测数据（2026-10-11，RTX 3050 Laptop）：同一工程全片渲染，无 GPU 2 小时 → 开硬件加速 15 分钟。
-- `nvidia-smi` 不存在的机器才跳过本节走纯 CPU（提速参数见 05 号 skill）。
+- `nvidia-smi` 不存在的机器才跳过本节走纯 CPU（提速参数见 [`remotion-render-delivery`](../remotion-render-delivery/SKILL.md)）。
 
 ## 剪辑手法纪律（必读）
 
@@ -115,4 +115,4 @@ https://github.com/Quriosity-agent/remotion-prompts（含中文分类版）。
 ## 冒烟测试
 
 写完工程先渲 `--frames=0-90` 出完整 mp4（含封装步），浏览器预览不报错不算数。
-冒烟通过才允许跑全片。渲染与失败恢复的全部硬规则见 05 号 skill。
+冒烟通过才允许跑全片。渲染与失败恢复的全部硬规则见 [`remotion-render-delivery`](../remotion-render-delivery/SKILL.md)。

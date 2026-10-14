@@ -31,7 +31,7 @@ chrome.exe --remote-debugging-port=9222 --user-data-dir=./.chrome-doubao \
 3. **doubao-one.mjs**：单条全流程——发送提示词 → 每 5s 轮询「停止生成」字样消失
    → 确认有新图出现 → 用 playwright 的 `ctx.request.get()`（共享 cookie）下载原图 → 退出。
 4. **看护（用户硬规则 2026-10-10）**：整批任务日志必须以 BG_SUCCESS/BG_FAIL 收尾，
-   用 `../05-render-delivery/scripts/watch-bg.mjs` 做前台/后台看护（标记定论 + 卡死检测），
+   用 `../remotion-render-delivery/scripts/watch-bg.mjs` 做前台/后台看护（标记定论 + 卡死检测），
    禁止向对话输出过程信息、禁止 sleep 或手动轮询。
 
 ```bash
@@ -49,9 +49,9 @@ node launch-doubao.mjs && bash run-illus.sh > gen.log 2>&1 &
   只看首图就退出，本轮 8 宫格剩余图会晚到、被下一轮误认为自己的新图。
 - 每条提示词生成的是 8 宫格大图，**底部有豆包水印**：用 ffmpeg 裁掉
   （1536×1024 → `crop=1536:944:0:0`），裁完再进合成。
-- 提示词纪律见 02 号 skill：**画面中绝不出现文字**（AI 生图文字必乱码）。
+- 提示词纪律见 [`video-script`](../video-script/SKILL.md)：**画面中绝不出现文字**（AI 生图文字必乱码）。
 - 首图出来后人工目检一次风格是否统一，不统一先调固定前缀再跑全量。
 
 ## 产出
 
-`illus/<场景ID>_<n>.jpg`——直接被 04 号 skill 的 Remotion 工程引用（放 `public/illus/`）。
+`illus/<场景ID>_<n>.jpg`——直接被 [`remotion-film`](../remotion-film/SKILL.md) 的 Remotion 工程引用（放 `public/illus/`）。
