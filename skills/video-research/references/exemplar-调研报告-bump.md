@@ -1,8 +1,14 @@
+---
+description: 深度调研报告范本（BUMP OF CHICKEN 案例）：初次交付即按十维度清单一次到位，含与姊妹报告的镜像命题写法。
+metadata:
+  tags: research, exemplar, report
+---
+
 # BUMP OF CHICKEN：登顶的顶流，错位的存续
 ## ——CD 时代乐队顶流样本调研（RADWIMPS 报告姊妹篇·深化版）
 
 > 调研日期：2026-10-14（深化轮同日完成）｜方法：deep-research 8 步法｜独立子代理校验 2 轮（修正 5+4 处）
-> 姊妹篇：《RADWIMPS 为什么没有成为顶流》（~/Downloads/research/radwimps-top-tier/），对照组数据互引。
+> 姊妹篇：《RADWIMPS 为什么没有成为顶流》（同目录 [`exemplar-调研报告-radwimps.md`](exemplar-调研报告-radwimps.md)），对照组数据互引。
 
 ## 0. 一句话结论
 
@@ -96,4 +102,4 @@
 ## 主要参考
 
 Wikipedia（Bump of Chicken 条目及可靠镜像交叉）、Oricon 官网（№2446038 ray 破亿；2026-09 ロビンソン百万 PT）、Oricon 官方新闻（天体観測 58.1 万）、tokyohive（2015/2021 红白曲目表）、aramajapan/tokyohive/am730（直井事件）、LikeJapan/KKBOX（流媒解禁、樱井和寿）、otomo.net（RADWIMPS×BUMP 对盘）、animecorner.me（2022 Spotify 动画曲榜）、kworb/playbeat（Spotify 快照）、TALKIN' ROCK #25（藤原，经 The Chickens 转引）、The Chickens 研究站（ダンデライオン/Aurora 楽曲解説）、VocaWiki+Japan Today（ray×初音）、mixi news/Oricon（Spitz）、Mr.Children 官网、Toyo Keizai（OOR/BABYMETAL）、studiorag/ragnet（人气与受众榜）、nordot 官方新闻稿（I/50 万人）。
-完整证据链见同目录 02_事实卡片.md（A-N 十四组）、03_推导过程.md（C1-C15）、05.5_校验记录.md（两轮）；镜像命题另一半见 ~/Downloads/research/radwimps-top-tier/FINAL_调研报告.md。
+完整证据链见该案例项目自身的 02_事实卡片.md（A-N 十四组）、03_推导过程.md（C1-C15）、05.5_校验记录.md（两轮，均属案例工作区，不在本仓库）；镜像命题另一半见同目录 [`exemplar-调研报告-radwimps.md`](exemplar-调研报告-radwimps.md)。

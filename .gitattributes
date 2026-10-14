@@ -1,0 +1,19 @@
+# 统一换行为 LF。
+# 关键：.sh 必须是 LF，否则 Windows 上用 core.autocrlf=true 检出后，
+# Git Bash 执行会报 `$'\r': command not found`。
+* text=auto eol=lf
+
+# 二进制资源不做换行转换
+*.jpg binary
+*.jpeg binary
+*.png binary
+*.gif binary
+*.webp binary
+*.mp4 binary
+*.mp3 binary
+*.wav binary
+*.zip binary
+*.ttf binary
+*.otf binary
+*.woff binary
+*.woff2 binary

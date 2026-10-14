@@ -1,3 +1,9 @@
+---
+description: Issue Tree 问题拆解规程（麦肯锡法）：把模糊的大问题拆成可独立回答、可挂具体证据的子问题集，也是派子 Agent 的准入标准。
+metadata:
+  tags: research, issue-tree, mece, decomposition
+---
+
 # Issue Tree 问题拆解规程（麦肯锡法）
 
 > 本文件是 video-research skill 的 [建议] 级参考。标准专题按此执行；快查型可跳过。

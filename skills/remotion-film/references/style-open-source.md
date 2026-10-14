@@ -1,6 +1,5 @@
 ---
-name: style-open-source
-description: 5 个衍生自高质量开源项目的视频风格（08-12）：来源、视觉规则、Remotion 落地要点。
+description: 5 个衍生自高质量开源项目的视频风格（⑧–⑫）：来源、视觉规则、Remotion 落地要点与混搭规则。
 metadata:
   tags: style, open-source, geist, neo-brutalism, aceternity, roughjs, echarts
 ---

@@ -1,11 +1,15 @@
 ---
 name: video-script
-description: |
-  把调研报告转化为视频文案、分镜表、逐句字幕稿和插画提示词清单。
-  产出的 prompts.txt 和字幕 JSON 是豆包生图与 Remotion 合成的直接输入。
+description: 把调研报告转化为视频文案、分镜表、逐句字幕稿与插画提示词清单，产出的 prompts.txt 与字幕 JSON 是豆包生图与 Remotion 合成的直接输入。当用户已有调研结论、要写视频文案/分镜/字幕，或要把文案拆成插画提示词时使用。触发词：写视频文案、分镜表、字幕稿、插画提示词。
+license: MIT
+metadata:
+  version: "2.2"
+  stage: "2-script"
 ---
 
 # 阶段 2 · 文案与分镜
+
+> 输入：阶段 1 的 `FINAL_调研报告.md` + Step 0 已定稿的风格 ｜ 产出：`视频文案.md`、`分镜表.md`、`subs/*.json`、`prompts.txt`、`发布信息包.md` ｜ 依赖：[`remotion-film`](../remotion-film/SKILL.md) 的风格样板页（Step 0 必用）。
 
 ## 前置条件（BLOCKING）
 
@@ -102,7 +106,7 @@ Q版漫画人物，构图简洁大量留白。
 
 - **画面里绝不出现文字**——AI 生图的文字必然乱码，文字全部由 Remotion 代码层叠加。
 - 提示词只描述"看得见的东西"：人物在做什么、有哪些道具、光线氛围。
-- 风格模板可整体替换（像素风/复古电视/水墨…见 [`remotion-film`](../remotion-film/SKILL.md) 的 7 风格方法论），
+- 风格模板可整体替换（像素风/复古电视/水墨…见 [`remotion-film`](../remotion-film/SKILL.md) 的 12 种风格方法论：7 基础 + 5 开源衍生），
   但前缀后缀纪律不变。
 
 ## TTS 与时长表
@@ -122,3 +126,9 @@ Q版漫画人物，构图简洁大量留白。
   超过 1s 的段人工核对句数与停顿是否匹配。
 - **timeline 的段落时长以 TTS 实测时长为准**，不是文案字数估算。
 - 多段 TTS 音色漂移的根治：用 voiceclone（参考音频锁音色），或全片用同一预置音色。
+
+## 本 skill 资源
+
+| 路径 | 用途 |
+|---|---|
+| [`scripts/align-subs.mjs`](scripts/align-subs.mjs) | 字幕句级强制对齐：silencedetect 反推每句真实起点，三级策略（1:1 → 合并最小间隙 → 按字数分摊） |

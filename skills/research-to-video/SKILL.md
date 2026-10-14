@@ -3,11 +3,13 @@ name: research-to-video
 description: 全自动视频流水线总入口：深度调研 → 文案分镜 → 豆包插画 → Remotion 合成 → 渲染 QA 发布。当用户给出一个选题要做视频（B站/科普/专题）时使用，按阶段编排 video-research、video-script、doubao-images、remotion-film、remotion-render-delivery 五个子 skill。触发词：做视频、选题成片、全自动视频流水线。
 license: MIT
 metadata:
-  version: "2.1"
-  stage: orchestrator
+  version: "2.2"
+  stage: "orchestrator"
 ---
 
 # 调研到成片 · 全流程编排
+
+> 输入：一个选题 + 用户边界 ｜ 产出：可发布的 `成片.mp4` + `cover.png` + `发布信息包.md` ｜ 依赖：本 pack 全部 5 个子 skill（video-research / video-script / doubao-images / remotion-film / remotion-render-delivery，见下表）。
 
 给一个选题，产出一条有事实依据、有插画、有旁白字幕、可直接发布的 MP4 成片。
 

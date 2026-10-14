@@ -1,3 +1,9 @@
+---
+description: 调研报告成稿技艺 10 条与报告结构模板——决定报告质量上限的写作规则，写作时逐条对照。
+metadata:
+  tags: research, report-craft, writing
+---
+
 # 调研报告成稿技艺（10 条 + 结构模板）
 
 > 本文件是 video-research skill 的 [建议] 级参考。框架只保证方向和结构，成稿差距在以下技艺。

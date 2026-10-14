@@ -1,6 +1,5 @@
 ---
-name: editing-craft
-description: 剪辑手法强化指南 - 让代码画的视频摆脱"简陋感"的硬规则。每个规则都对应 Remotion 具体 API 用法。
+description: 剪辑手法强化指南——让代码画的视频摆脱"简陋感"的硬规则，每条都对应 Remotion 具体 API。
 metadata:
   tags: editing, pacing, motion-design, anti-slop, craft
 ---
@@ -84,7 +83,8 @@ metadata:
 
 ## 6. 转场——不要每一场都用同一个
 
-- 用 `<TransitionSeries>`（见 [transitions.md](transitions.md)），但：
+- 用 `<TransitionSeries>`（`@remotion/transitions`，官方文档
+  https://www.remotion.dev/docs/transitions），但：
   **连续两场不许用同一种转场**。fade → slide → wipe 轮换，
   且全片 fade 占比 < 1/3。
 - 转场时长 10–20 帧（0.3–0.7 秒），太久拖节奏。
@@ -94,8 +94,8 @@ metadata:
 
 ## 7. 文字动效——字是 B 站视频的第一主角
 
-- **逐字/逐词进场**（见 [text-animations.md](references/assets/text-animations-typewriter.tsx)
-  和 [display-captions.md](display-captions.md)），禁止整段文字一起淡入。
+- **逐字/逐词进场**（逐字拆 `useCurrentFrame()` 切片 + stagger 延迟；官方字幕文档
+  https://www.remotion.dev/docs/captions），禁止整段文字一起淡入。
 - **关键词高亮**：字幕中关键词变色/加粗/放大 + 微弹，
   用 `@remotion/captions` 的 word-level 时间戳做卡拉 OK 式高亮。
 - **数字滚动**：数据展示用 `interpolate` + `Easing.out` 从 0 滚到目标值，
@@ -132,8 +132,8 @@ metadata:
 - ❌ 每场转场都是同一个 fade
 - ❌ 纯色背景 + 居中单元素、无任何纹理层
 - ❌ 结尾静止帧 / "谢谢观看"白屏
-- ✅ 风格基调以「style-7-methods.md（7 种代码画风方法论）」为准，
-  做视频前先读同目录的 [style-7-methods.md](style-7-methods.md)
+- ✅ 风格基调以同目录两份方法论为准：基础 7 风格 [style-7-methods.md](style-7-methods.md)
+  + 开源衍生 5 风格 [style-open-source.md](style-open-source.md)（合计 12 种），做视频前先读
 
 ## 11. 标准镜头模板（可直接抄的组合拳）
 

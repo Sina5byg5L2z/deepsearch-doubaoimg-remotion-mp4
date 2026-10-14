@@ -10,3 +10,6 @@
 | `发布信息包.md` | 05 交付 | 标题三选一、封面文案、简介、标签、弹幕埋点、发布时段 |
 
 对应成片参数：31 场景 / 31000+ 帧 / 30+ 张豆包插画 / 逐句字幕 + 章节进度条 / TTS 旁白混音。
+
+阶段 01 的调研报告范本不在本目录：同一份内容只保留一份，见
+[`skills/video-research/references/exemplar-调研报告-radwimps.md`](../../skills/video-research/references/exemplar-调研报告-radwimps.md)。

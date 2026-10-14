@@ -1,12 +1,15 @@
 ---
 name: remotion-film
-description: |
-  Remotion 代码合成视频工程指南：工程结构、timeline 构建器、TTS 时长对齐、
-  7 种代码画风方法论、剪辑手法强化指南（反 AI 味纪律）。
-  触发词：Remotion、代码画视频、合成视频、视频工程。
+description: Remotion 代码合成视频工程指南：工程结构、timeline 构建器、TTS 时长对齐与声画同步、12 种代码画风方法论（7 基础 + 5 开源衍生）、剪辑手法强化指南（反 AI 味纪律）。当用户要用代码/React 合成视频、搭建 Remotion 工程，或要做"代码画视频"风格选型时使用。触发词：Remotion、代码画视频、合成视频、视频工程、风格样板。
+license: MIT
+metadata:
+  version: "2.2"
+  stage: "4-film"
 ---
 
 # 阶段 4 · Remotion 合成工程
+
+> 输入：`illus/`（裁完水印的插画）、`public/subs/*.json`（逐句字幕）、`durations.json`（TTS 实测时长）｜ 产出：Remotion 工程 + `public/data/timeline.json` + 冒烟渲染片 ｜ 依赖：[`video-script`](../video-script/SKILL.md) 的 `align-subs.mjs`（字幕句级对齐）；渲染与交付走 [`remotion-render-delivery`](../remotion-render-delivery/SKILL.md)。
 
 ## 工程结构
 
@@ -24,7 +27,7 @@ film/
 │   ├── kit.jsx               # 皮肤层：字体、色板、字幕条、章节进度、质感层（噪点/扫描线/暗角）
 │   ├── Film.jsx              # 场景组件：读 timeline，逐段 <Sequence>
 │   └── Cover.jsx             # 封面组件（remotion still 单独渲）
-└── build-timeline.mjs        # 见 examples/
+└── build-timeline.mjs        # 通用模板见 scripts/build-timeline.mjs
 ```
 
 ## timeline.json 构建器（核心中间层）
@@ -36,7 +39,7 @@ film/
 - **一切时间量化到整数帧**：片头留白、段间呼吸（0.55s）、每段 from/dur 在输出前全部经过
   `Math.round(sec * FPS)` 落到帧网格（FPS 环境变量可配，默认 30，必须与 Composition 一致）
 - **段落时长 = TTS 实测时长**（帧量化后）+ 段间呼吸，总时长据此推算
-- 中文字幕自动换行：标点优先断行、数字/小数点/省略号不拆开（完整实现见 `examples/build-timeline.mjs`）
+- 中文字幕自动换行：标点优先断行、数字/小数点/省略号不拆开（完整实现见 [`scripts/build-timeline.mjs`](scripts/build-timeline.mjs)）
 
 ## 声画同步硬规则（违者必出不同步）
 
@@ -116,3 +119,13 @@ https://github.com/Quriosity-agent/remotion-prompts（含中文分类版）。
 
 写完工程先渲 `--frames=0-90` 出完整 mp4（含封装步），浏览器预览不报错不算数。
 冒烟通过才允许跑全片。渲染与失败恢复的全部硬规则见 [`remotion-render-delivery`](../remotion-render-delivery/SKILL.md)。
+
+## 本 skill 资源
+
+| 路径 | 用途 |
+|---|---|
+| [`assets/style-samples.html`](assets/style-samples.html) | Step 0 风格样板选择页（12 种，含 AI 自动匹配矩阵）——开工前必须 present 给用户 |
+| [`scripts/build-timeline.mjs`](scripts/build-timeline.mjs) | timeline.json 通用构建器：帧量化 + 字幕自动换行 + 章节进度 |
+| [`references/editing-craft.md`](references/editing-craft.md) | 剪辑手法纪律 12 节 + 渲染前自检清单（写场景组件前必读） |
+| [`references/style-7-methods.md`](references/style-7-methods.md) | 基础 7 风格方法论（①–⑦） |
+| [`references/style-open-source.md`](references/style-open-source.md) | 开源衍生 5 风格（⑧–⑫）落地手册与混搭规则 |

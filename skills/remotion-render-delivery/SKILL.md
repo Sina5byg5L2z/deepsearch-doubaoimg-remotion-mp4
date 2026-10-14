@@ -1,12 +1,15 @@
 ---
 name: remotion-render-delivery
-description: |
-  Remotion 长片渲染防白跑清单、日志看门狗、渲染监控网页、ffmpeg 混音封装坑、
-  抽帧 QA、发布包。凡是渲染超过 2 分钟的 Remotion 工程必须执行本 skill。
-  触发词：渲染、白跑、渲染监控、混音、发布。
+description: Remotion 长片渲染防白跑清单、日志看门狗、渲染监控网页、ffmpeg 混音与封装坑、抽帧 QA、发布包。当需要渲染任何超过 2 分钟的 Remotion 工程，或要做 ffmpeg 混音封装、抽帧 QA、发布包时使用，必须执行本 skill。触发词：渲染、白跑、渲染监控、混音封装、抽帧 QA、发布包。
+license: MIT
+metadata:
+  version: "2.2"
+  stage: "5-render-delivery"
 ---
 
 # 阶段 5 · 渲染 · QA · 交付
+
+> 输入：Remotion 工程 + `timeline.json`（[`remotion-film`](../remotion-film/SKILL.md) 产出）+ TTS wav ｜ 产出：`成片.mp4`、`cover.png`、`发布信息包.md`、`qa/` 抽帧 ｜ 依赖：系统 ffmpeg/ffprobe、Node ≥ 18；本 skill 的 `watch-bg.mjs` 也是其他阶段后台任务的通用看护工具。
 
 > 本清单每一条都是实战踩坑换来的硬规则：20 分钟渲染白跑、机器死机、链条假死都发生过。
 
@@ -157,3 +160,13 @@ done < qa_times.txt   # 覆盖每个场景中段 + 字幕密集段
   **发布时段**：目标受众活跃时间。完整模板见 `发布信息包.md` 示例。
 - 封面：`remotion still src/index.js Cover cover.png --frame=90`，单独出。
 - 结尾页固定文案（如适用）：「推测性内容已在片中明确标注 · 如有错误或补充，欢迎在评论区指出」。
+
+## 本 skill 资源
+
+| 路径 | 用途 |
+|---|---|
+| [`scripts/watch-bg.mjs`](scripts/watch-bg.mjs) | 后台任务看护（`BG_SUCCESS`/`BG_FAIL`/`BG_HANG`/`BG_RUNNING` + `--gate` 健康门），其他阶段的后台任务也统一用它 |
+| [`scripts/finish-chain.sh`](scripts/finish-chain.sh) | 渲染链封装：`rend()` 看门狗 + 混音 + 封装，一条龙跑完 |
+| [`scripts/build-audio-mix.mjs`](scripts/build-audio-mix.mjs) | 混音：偏移读 timeline.json、`adelay` 定位、补静音、两遍 loudnorm、输出前 `SYNC_CHECK` |
+| [`scripts/post.sh`](scripts/post.sh) | 成片封装：`--muted` 视频 + 混音 wav → final.mp4 |
+| [`render-monitor/server.mjs`](render-monitor/server.mjs) | 渲染进度监控网页（`node render-monitor/server.mjs --dir <日志目录> --port 8788`） |

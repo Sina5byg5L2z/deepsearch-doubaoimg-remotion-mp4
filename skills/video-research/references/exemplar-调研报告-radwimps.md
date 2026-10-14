@@ -1,3 +1,9 @@
+---
+description: 深度调研报告范本（RADWIMPS 案例）：多轮调教后定稿的完整报告，写作时逐条对照。
+metadata:
+  tags: research, exemplar, report
+---
+
 # RADWIMPS 为什么没有成为顶流？——深度调研报告
 
 > 调研日期：2026-10-04 ｜ 方法：8 步深度调研法（事实卡片 → 对比框架 → 推导链 → 独立校验 → 用例验证）

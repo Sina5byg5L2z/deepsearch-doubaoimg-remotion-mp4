@@ -3,11 +3,13 @@ name: video-research
 description: 视频选题的深度调研（8 步法 + 事实纪律 + 十维度清单），产出可追溯的调研报告作为后续文案的事实底座。当用户给出视频选题要先调研、要求深度调研或调研报告时使用。触发词：做视频前调研、深度调研、调研一下。
 license: MIT
 metadata:
-  version: "2.1"
+  version: "2.2"
   stage: "1-research"
 ---
 
 # 阶段 1 · 深度调研
+
+> 输入：视频选题 + 用户边界（对象/地域/时间）｜ 产出：`research/FINAL_调研报告.md` + 事实卡片 + 校验记录 ｜ 依赖：无（本 skill 自包含，可独立使用）。
 
 文案里每一个事实都必须能追溯到一张事实卡片。
 
@@ -165,3 +167,12 @@ metadata:
 
 `FINAL_调研报告.md`：摘要（一句话结论）+ 按分析框架的结构化章节 + 每个关键事实附出处链接。
 这份报告直接作为阶段 2（文案）的唯一事实来源。
+
+## 本 skill 资源
+
+| 路径 | 用途 |
+|---|---|
+| [`references/issue-tree.md`](references/issue-tree.md) | Issue Tree 问题拆解规程（麦肯锡法，[建议]级） |
+| [`references/report-craft.md`](references/report-craft.md) | 成稿技艺 10 条 + 报告结构模板（[建议]级） |
+| [`references/exemplar-调研报告-radwimps.md`](references/exemplar-调研报告-radwimps.md) | 多轮调教后定稿的完整范本 |
+| [`references/exemplar-调研报告-bump.md`](references/exemplar-调研报告-bump.md) | 初次交付即按十维度清单一次到位的范本 |

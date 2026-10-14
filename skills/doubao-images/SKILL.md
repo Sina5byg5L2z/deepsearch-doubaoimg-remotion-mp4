@@ -1,14 +1,23 @@
 ---
 name: doubao-images
-description: |
-  用豆包（doubao.com）批量生成插画的全自动方案：常驻 Chrome CDP + playwright-core，
-  登录一次后零人工批量生成、轮询、下载。免费，不消耗任何生图 API 额度。
-  触发词：生成插画、批量生图、豆包画图。
+description: 用豆包（doubao.com）网页版批量生成插画的全自动方案：常驻 Chrome CDP + playwright-core，登录一次后零人工批量生成、轮询、下载，免费且不消耗任何生图 API 额度。当用户要按提示词清单批量出插画/配图，或需要免 API 额度的批量生图方案时使用。触发词：生成插画、批量生图、豆包画图、豆包出图。
+license: MIT
+metadata:
+  version: "2.2"
+  stage: "3-images"
 ---
 
 # 阶段 3 · 豆包批量插画（CDP 自动化）
 
+> 输入：`prompts.txt`（`场景ID|提示词`，来自 [`video-script`](../video-script/SKILL.md)）｜ 产出：`illus/<场景ID>_<n>.jpg`（已裁水印）｜ 依赖：本机 Chrome、`playwright-core`；看护用 [`remotion-render-delivery`](../remotion-render-delivery/SKILL.md) 的 `watch-bg.mjs`。
+
 豆包网页版生图免费且质量足够；通过 Chrome DevTools Protocol 全自动化后可无人值守批量出图。
+
+## 前置条件（BLOCKING）
+
+- `prompts.txt` 已由阶段 2 产出，且**逐条通过"画面无文字"检查**——提示词带文字 = 整批图报废重跑。
+- 一次性准备已完成（下方两节），`launch-doubao.mjs` 能输出 `CDP_READY`。
+- 风格固定前缀已与 Step 0 定稿风格一致；先跑 1 条人工目检风格统一，再跑全量。
 
 ## 一次性准备
 
@@ -55,3 +64,12 @@ node launch-doubao.mjs && bash run-illus.sh > gen.log 2>&1 &
 ## 产出
 
 `illus/<场景ID>_<n>.jpg`——直接被 [`remotion-film`](../remotion-film/SKILL.md) 的 Remotion 工程引用（放 `public/illus/`）。
+
+## 本 skill 资源
+
+| 路径 | 用途 |
+|---|---|
+| [`scripts/launch-doubao.mjs`](scripts/launch-doubao.mjs) | 拉起/连接 Chrome CDP（detached），就绪后输出 `CDP_READY` |
+| [`scripts/doubao-one.mjs`](scripts/doubao-one.mjs) | 单条提示词全流程：发送 → 轮询判据 → 下载原图 |
+| [`scripts/run-illus.sh`](scripts/run-illus.sh) | 整批跑 `prompts.txt`：断点续跑 + 失败重试 + `BG_SUCCESS`/`BG_FAIL` 收尾 |
+| [`scripts/prompts.example.txt`](scripts/prompts.example.txt) | `prompts.txt` 格式示例（`场景ID\|提示词`） |
