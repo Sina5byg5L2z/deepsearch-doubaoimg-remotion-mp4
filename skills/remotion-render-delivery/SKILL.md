@@ -116,7 +116,8 @@ node render-monitor/server.mjs --dir <渲染日志目录> --port 8788
 
 - **流程**：`--frames=0-300` 測試片逐项对比 → 保留实测有效项 → 全片只跑一次。
   **禁止中途停掉全片渲染换参数**（每次停 = 进度全废）。
-- 实测有效：`--concurrency=10`（12 反而更慢）、`setJpegQuality(85)`、
+- 实测有效：并发数不传走 Remotion 默认（`--concurrency=10` 实测反而更慢，
+  12 更慢）、`setJpegQuality(85)`、
   `--x264-preset=faster`、TEMP→大容量盘。1080p30 约 0.08–0.11 s/帧是正常速度，不是"没走 GPU"。
 - 禁止在一个循环里连续多次调用 remotion render 抽帧（连续重启 Chrome 会压死机器）；
   抽帧用系统 ffmpeg 从成片截。

@@ -71,16 +71,26 @@ const fresh = [...new Set(now.filter(s => !before.has(s)))];
 console.log('NEW_IMGS', fresh.length);
 let n = 0;
 for (const src of fresh) {
-  try {
-    // 共享浏览器 cookie 下载原图（直接抓 img.src 会拿到缩略图）
-    const resp = await ctx.request.get(src, { headers: { Referer: 'https://www.doubao.com/' } });
-    const buf = await resp.body();
-    const ext = src.includes('.jpeg') || src.includes('.jpg') ? '.jpg' : '.png';
-    const fp = path.join(OUTDIR, `${PREFIX}_${n}${ext}`);
-    writeFileSync(fp, buf);
-    console.log('SAVED', fp, buf.length);
-    n++;
-  } catch (e) { console.log('DL_FAIL', String(e).slice(0, 120)); }
+  let ok = false;
+  for (let att = 0; att < 3 && !ok; att++) {
+    try {
+      // 共享浏览器 cookie 下载原图（直接抓 img.src 会拿到缩略图）
+      const resp = await ctx.request.get(src, { headers: { Referer: 'https://www.doubao.com/' } });
+      const buf = await resp.body();
+      if (buf.length < 50000) throw new Error('too small ' + buf.length);  // 防缩略图
+      const ext = src.includes('.jpeg') || src.includes('.jpg') ? '.jpg' : '.png';
+      const fp = path.join(OUTDIR, `${PREFIX}_${n}${ext}`);
+      writeFileSync(fp, buf);
+      console.log('SAVED', fp, buf.length);
+      n++; ok = true;
+    } catch (e) {
+      console.log('DL_RETRY', att + 1, String(e).slice(0, 100));
+      await new Promise(r => setTimeout(r, 3000));  // 2026-10-16 实测：连接 abort 需重试（s21 曾因此丢图且误判成功）
+    }
+  }
+  if (!ok) console.log('DL_FAIL', src.slice(0, 80));
 }
 console.log('DONE', n);
-process.exit(0);
+// 2026-10-16 硬规则：有新图但 0 张下载成功 = 失败（exit 3），runner 必须重试；
+// 旧版此处 exit(0) 导致 DONE 0 被当成功、该场景永久缺图
+process.exit(n > 0 ? 0 : 3);

@@ -18,7 +18,7 @@ metadata:
 | 阶段 | Skill | 交付物 | 通过标准 |
 |---|---|---|---|
 | 1. 调研 | [`video-research`](../video-research/SKILL.md) | FINAL_调研报告.md + 事实卡片 | **初次交付即满维度（十维度清单自查通过）**；独立 Agent 校验通过且校验员指出的遗漏已当场闭合；专名全部逐字核实 |
-| 2. 文案 | [`video-script`](../video-script/SKILL.md) | 视频文案.md + 分镜表 + 字幕稿 + prompts.txt | 钩子选型完成；六项自检全过；字幕逐句编号 |
+| 2. 文案 | [`video-script`](../video-script/SKILL.md) | 视频文案.md（含逻辑大纲）+ 分镜表 + 字幕稿 + prompts.txt | 一句话主线 + 幕级论证链已定稿且连读通顺；钩子选型完成；八项自检全过；字幕逐句编号 |
 | 3. 插画 | [`doubao-images`](../doubao-images/SKILL.md) | illus/*.jpg（每场景 1-2 张） | 全部生成成功；无文字水印；裁掉水印区 |
 | 4. 合成 | [`remotion-film`](../remotion-film/SKILL.md) | Remotion 工程 + timeline.json | 冒烟渲染（0-90 帧）通过 |
 | 5. 渲染 | [`remotion-render-delivery`](../remotion-render-delivery/SKILL.md) | 成片.mp4 + cover.png + 发布包 | 抽帧 QA 通过；ffprobe 时长核对 |
@@ -54,8 +54,10 @@ metadata:
    （目标/边界/输出格式/读写文件路径），产物经工作区文件传递，只返回「≤200 字摘要 + 产出文件路径」。
 4. **[必须] 后台任务标准流程**：一切后台任务（生图/TTS/渲染）按 remotion-render-delivery 的四步 SOP 走
    （提交带收尾标记 → 健康门 → 阻塞等待定论 → 渲染类同时开监控网页），不依赖推送通知，严禁 sleep 轮询。
-5. **[必须] 文案工艺门槛**：阶段 2 写文案前完成钩子选型（环境装有 `short-video-script-cn` skill 时
-   先查其爆款结构库；没有则按 video-script 的钩子类型自行选型），写完跑完六项自检并全过。
+5. **[必须] 文案工艺门槛**：阶段 2 写文案前先定逻辑大纲（一句话主线 + 幕级论证链，
+   连读不通顺不得进入正文写作），再完成钩子选型（环境装有 `short-video-script-cn` skill 时
+   先查其爆款结构库；没有则按 video-script 的钩子类型自行选型），写完跑完八项自检并全过。
+   向用户展示文案时，逻辑大纲放在最前面给用户先审。
 6. **[必须] 抽帧 QA**：渲完抽 5–9 帧目检，发现问题改完重渲再交付。
 7. **[建议] 提速参数、风格混搭、发布时段优化**等按需取用，不作为流程门槛。
 

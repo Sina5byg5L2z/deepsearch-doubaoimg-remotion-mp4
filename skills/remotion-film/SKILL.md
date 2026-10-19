@@ -59,8 +59,9 @@ film/
 
 ```bash
 node node_modules/@remotion/cli/remotion-cli.js render src/index.js Film out/full.mp4 \
-  --concurrency=10 --x264-preset=faster --muted
+  --x264-preset=faster --muted
 # .bin/remotion 是 sh 包装脚本，用 node 直接跑 cli 入口
+# 并发数不传（走 Remotion 默认）：实测 --concurrency=10 反而比默认慢
 # --muted 渲染无声视频，音轨由 ffmpeg 后期混入（见 remotion-render-delivery）
 ```
 
