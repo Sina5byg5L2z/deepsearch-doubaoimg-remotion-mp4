@@ -63,7 +63,7 @@ rend() {  # rend TAG 完成标记正则 日志文件 命令...
 node render-monitor/server.mjs --dir <渲染日志目录> --port 8788
 # 打开 http://localhost:8788：大字百分比/进度条/速度曲线/阶段流水灯/失败横幅，1s 自动刷新
 ```
-自动发现目录里最新 render*.log，解析 "Rendered N/M, time remaining" 与 *_EXIT 标记。
+自动发现目录里全部 *.log（按文件名前缀+内容自动识别渲染/步骤类型，新增日志前缀无需改代码），解析 "Rendered N/M, time remaining" 与通用 XXX_EXIT=n 标记。
 
 ## 后台任务标准流程（唯一方式，2026-10-12 修订：不依赖任何推送通知）
 

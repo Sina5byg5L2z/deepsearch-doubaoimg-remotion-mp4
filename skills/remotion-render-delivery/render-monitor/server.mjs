@@ -1,6 +1,6 @@
 // 渲染监控 server：零依赖（Node 内置 http/fs）。
 // 用法：node server.mjs [--dir <渲染日志目录>] [--port 8788]
-// 数据源：目录下 render*.log / post*.log / cover*.log（Remotion 渲染链日志）。
+// 数据源：目录下全部 *.log（按文件名前缀+内容自动识别类型，新增日志前缀无需改代码）。
 // API:
 //   GET /            -> 仪表盘页面
 //   GET /api/logs    -> 可选日志列表
@@ -57,7 +57,14 @@ function parseLog(dir, name) {
   try { text = fs.readFileSync(file, 'utf8'); } catch { return { name, state: 'missing' }; }
   const lines = text.split(/\r?\n/).filter(Boolean);
   const tail = lines.slice(-6);
-  const kind = /^(render|fix)/.test(name) ? 'render' : name.startsWith('post') ? 'post' : 'cover';
+  // 类型判定：文件名前缀优先，其次按内容嗅探（避免新增日志前缀时监控失明）
+  const kind =
+    /^(render|chain|fix)/.test(name) ? 'render' :
+    /^post/.test(name) ? 'post' :
+    /^cover/.test(name) ? 'cover' :
+    /Rendered \d+\/\d+|Encoded \d+\/\d+|RENDER_EXIT=/.test(text) ? 'render' :
+    /_EXIT=/.test(text) ? 'step' :
+    'render';
 
   const st = { name, kind, tail, state: 'running', error: null };
 
@@ -96,16 +103,16 @@ function parseLog(dir, name) {
     return st;
   }
 
-  // post / cover 日志：步骤退出码
-  const exit = text.match(/(?:POST|COVER)_EXIT=(\d+)/);
-  if (exit) { st.state = exit[1] === '0' ? 'done' : 'failed'; if (st.state === 'failed') st.error = '步骤退出码非 0'; }
+  // post / cover / 其他步骤日志：通用退出码标记（XXX_EXIT=n）
+  const exit = text.match(/([A-Z]+)_EXIT=(\d+)/);
+  if (exit) { st.state = exit[2] === '0' ? 'done' : 'failed'; if (st.state === 'failed') st.error = '步骤退出码非 0'; }
   return st;
 }
 
 // 汇总：取最新 render 日志为主线，post/cover 作为后续阶段
 function status(dir, chosen) {
   let files = [];
-  try { files = fs.readdirSync(dir).filter(f => /^(render|fix|post|cover).*\.log$/.test(f)); } catch { /* 目录不存在 */ }
+  try { files = fs.readdirSync(dir).filter(f => f.toLowerCase().endsWith('.log')); } catch { /* 目录不存在 */ }
   const mtimeOf = f => { try { return fs.statSync(path.join(dir, f)).mtimeMs; } catch { return 0; } };
   files.sort((a, b) => mtimeOf(b) - mtimeOf(a));
 
@@ -128,14 +135,10 @@ function status(dir, chosen) {
 
   // 渲染成功后，看封装/封面链进度
   if (main.state === 'done' && main.kind === 'render') {
-    const postLog = files.find(f => f.startsWith('post'));
-    const coverLog = files.find(f => f.startsWith('cover'));
-    const p = postLog ? parseLog(dir, postLog) : null;
-    const c = coverLog ? parseLog(dir, coverLog) : null;
-    if (p && p.state === 'running') { out.stage = 'mux'; out.state = 'muxing'; }
-    else if (c && c.state === 'running') { out.stage = 'cover'; out.state = 'covering'; }
-    else if (c && c.state === 'done') { out.stage = 'all'; out.state = 'all_done'; }
-    else if (p && p.state === 'done' && !c) { out.stage = 'cover'; out.state = 'covering'; }
+    // 主线完成后的后续阶段：其余日志任一在跑=muxing，全部完成=all_done
+    const followers = files.filter(f => f !== active).map(f => parseLog(dir, f));
+    if (followers.some(o => o.state === 'running')) { out.stage = 'mux'; out.state = 'muxing'; }
+    else if (followers.length && followers.every(o => o.state === 'done')) { out.stage = 'all'; out.state = 'all_done'; }
     // 产物检查
     try {
       const mp4s = fs.readdirSync(dir).filter(f => f.endsWith('.mp4') && !f.includes('muted') && !f.startsWith('part'));
